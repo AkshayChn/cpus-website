@@ -21,15 +21,25 @@ Local site: `http://localhost:4321/`
 
 Production: `https://channesh.org/`
 
-## Build
+## Build and preview
 
 ```bash
 bun run build
 bun run preview
 ```
 
+Use Astro's Bun commands for local serving. Do **not** use
+`python3 -m http.server` as a project server; that was only a one-off static
+screenshot helper and bypasses Astro routing.
+
 The site is served at `https://channesh.org/` from the domain root. The deploy
 workflow builds with the default base path (`/`).
+
+## Checks
+
+```bash
+bun run check
+```
 
 ## Content
 
