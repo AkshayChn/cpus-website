@@ -14,7 +14,7 @@ import { url } from '../lib/url';
       </span>
     </a>
 
-    <nav class="hidden items-center gap-6 text-sm font-medium text-muted md:flex" aria-label="Primary">
+    <nav class="hidden items-center gap-6 text-sm font-medium text-muted lg:flex" aria-label="Primary">
       {site.nav.map((item) => (
         <a
           href={url(item.href)}
@@ -27,14 +27,8 @@ import { url } from '../lib/url';
     </nav>
 
     <div class="flex items-center gap-2">
-      <a
-        href={url('/donate/')}
-        class="hidden rounded-full bg-accent px-4 py-2 text-sm font-semibold text-paper transition-opacity hover:opacity-90 sm:inline-flex"
-      >
-        Donate
-      </a>
       <ThemeToggle />
-      <details class="group relative md:hidden">
+      <details class="group relative lg:hidden">
         <summary class="flex size-10 cursor-pointer list-none items-center justify-center rounded-full border border-rule text-muted [&::-webkit-details-marker]:hidden">
           <span class="sr-only">Open menu</span>
           <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
@@ -51,12 +45,6 @@ import { url } from '../lib/url';
                 {item.label}
               </a>
             ))}
-            <a
-              href={url('/donate/')}
-              class="mt-1 rounded-lg bg-accent px-3 py-2.5 text-sm font-semibold text-paper"
-            >
-              Donate
-            </a>
           </nav>
         </div>
       </details>
