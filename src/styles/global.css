@@ -27,6 +27,9 @@
   --color-accent-soft: var(--accent-soft);
   --color-highlight: var(--highlight);
   --color-highlight-soft: var(--highlight-soft);
+  --color-header: var(--header);
+  --color-header-ink: var(--header-ink);
+  --color-header-muted: var(--header-muted);
 }
 
 :root {
@@ -43,6 +46,9 @@
   --accent-soft: #e3efe9;
   --highlight: #b4552d;
   --highlight-soft: #f6e7dd;
+  --header: #e8c751;
+  --header-ink: #1c1b19;
+  --header-muted: #5b4a12;
 }
 
 [data-theme='dark'] {
