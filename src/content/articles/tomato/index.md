@@ -5,6 +5,7 @@ publishedAt: 2020-06-09
 series: journey-with-plants
 language: kn
 author: CPUS
+tags: [plants, food, agriculture, history]
 cover: ./cover.jpg
 coverAlt: "ಟೊಮ್ಯಾಟೊ ಗಿಡದಲ್ಲಿ ಕೆಂಪು ಮತ್ತು ಹಸಿರು ಹಣ್ಣುಗಳು"
 featured: true

@@ -29,6 +29,31 @@ export async function getArticle(slug: string): Promise<Article | undefined> {
   return articles.find((entry) => entry.id === slug);
 }
 
+export interface TagSummary {
+  tag: string;
+  count: number;
+}
+
+export async function getTags(): Promise<TagSummary[]> {
+  const articles = await getArticles();
+  const counts = new Map<string, number>();
+
+  for (const article of articles) {
+    for (const tag of article.data.tags) {
+      counts.set(tag, (counts.get(tag) ?? 0) + 1);
+    }
+  }
+
+  return Array.from(counts, ([tag, count]) => ({ tag, count })).sort((a, b) =>
+    a.tag.localeCompare(b.tag),
+  );
+}
+
+export async function getArticlesByTag(tag: string): Promise<Article[]> {
+  const articles = await getArticles();
+  return articles.filter((entry) => entry.data.tags.includes(tag));
+}
+
 export async function getFeaturedArticles(limit = 1): Promise<Article[]> {
   const articles = await getArticles();
   return articles.filter((entry) => entry.data.featured).slice(0, limit);

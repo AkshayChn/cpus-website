@@ -6,6 +6,7 @@ series: nobel-2026
 seriesOrder: 1
 language: kn
 author: CPUS
+tags: [nobel, medicine, neuroscience]
 cover: ./cover.jpg
 coverAlt: "ಕಾರ್ಲ್ ಡೈಸರೋತ್, ಪೀಟರ್ ಹೆಗೆಮನ್ ಮತ್ತು ಗಿಯೋರ್ಗ್ ನಾಗೆಲ್ ಅವರ ಭಾವಚಿತ್ರಗಳು ಮತ್ತು 2026ರ ವೈದ್ಯಕೀಯ ನೊಬೆಲ್"
 coverStyle: plate

@@ -6,6 +6,7 @@ series: nobel-2026
 seriesOrder: 4
 language: kn
 author: CPUS
+tags: [nobel, economics]
 cover: ./cover.jpg
 coverAlt: "ರಾಬರ್ಟ್ ಹಾಲ್ ಮತ್ತು ಮೈಕೆಲ್ ವುಡ್‌ಫರ್ಡ್ ಅವರ ಭಾವಚಿತ್ರಗಳು ಮತ್ತು 2026ರ ಅರ್ಥವಿಜ್ಞಾನದ ನೊಬೆಲ್"
 coverStyle: plate

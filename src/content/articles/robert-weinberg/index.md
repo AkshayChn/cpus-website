@@ -6,6 +6,7 @@ series: scientists-series
 seriesOrder: 1
 language: kn
 author: CPUS
+tags: [cancer, biology, scientists]
 cover: ./cover.jpeg
 coverAlt: "ರಾಬರ್ಟ್ ವೈನ್‌ಬರ್ಗ್ ಅವರ ಭಾವಚಿತ್ರ ಮತ್ತು ಲೇಖನದ ಶೀರ್ಷಿಕೆ"
 coverStyle: plate

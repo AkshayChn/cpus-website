@@ -6,6 +6,7 @@ series: nobel-2021
 seriesOrder: 2
 language: kn
 author: CPUS
+tags: [nobel, physics, climate]
 cover: ./cover.png
 coverAlt: "ಸಂಕೀರ್ಣ ವ್ಯವಸ್ಥೆಗಳನ್ನು ಸೂಚಿಸುವ ನೀಲಿ ಗೋಳ ಮತ್ತು ಬಾಣದ ಗುರುತುಗಳು"
 featured: false

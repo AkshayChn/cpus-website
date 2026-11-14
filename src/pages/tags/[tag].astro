@@ -1,0 +1,56 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Container from '../../components/Container.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import { getArticlesByTag, getSeriesMap, getTags } from '../../lib/content';
+import { url } from '../../lib/url';
+
+export async function getStaticPaths() {
+  const tags = await getTags();
+  return tags.map(({ tag }) => ({
+    params: { tag },
+    props: { tag },
+  }));
+}
+
+const { tag } = Astro.props;
+const [articles, seriesMap] = await Promise.all([getArticlesByTag(tag), getSeriesMap()]);
+---
+
+<BaseLayout
+  title={`#${tag}`}
+  description={`Articles tagged #${tag} on CPUS.`}
+>
+  <Container class="py-10 sm:py-14">
+    <header class="max-w-2xl">
+      <p class="text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-highlight">Tag</p>
+      <h1 class="mt-2 text-4xl font-semibold tracking-tight text-ink sm:text-5xl">#{tag}</h1>
+      <p class="mt-4 text-lg leading-relaxed text-muted">
+        {articles.length} {articles.length === 1 ? 'article' : 'articles'} tagged #{tag}.
+      </p>
+      <a href={url('/tags/')} class="mt-4 inline-flex items-center gap-1 text-sm font-medium text-accent hover:underline">
+        All tags <span aria-hidden="true">→</span>
+      </a>
+    </header>
+  </Container>
+
+  <Container class="pb-12">
+    <div class="mb-5 flex items-end justify-between gap-3 border-b border-rule pb-3">
+      <h2 class="text-xl font-semibold tracking-tight text-ink">Articles</h2>
+      <span class="text-sm text-muted">{articles.length} total</span>
+    </div>
+
+    {articles.length > 0 ? (
+      <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        {articles.map((article) => (
+          <ArticleCard
+            article={article}
+            series={article.data.series ? seriesMap.get(article.data.series.id) : undefined}
+          />
+        ))}
+      </div>
+    ) : (
+      <p class="text-muted">No articles with this tag yet.</p>
+    )}
+  </Container>
+</BaseLayout>

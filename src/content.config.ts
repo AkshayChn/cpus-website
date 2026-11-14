@@ -19,6 +19,9 @@ const articles = defineCollection({
       seriesOrder: z.number().optional(),
       language: z.enum(['kn', 'en']).default('kn'),
       author: z.string().default('CPUS'),
+      tags: z
+        .array(z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/))
+        .default([]),
       cover: image().optional(),
       coverAlt: z.string().optional(),
       coverStyle: z.enum(['hero', 'plate']).optional(),

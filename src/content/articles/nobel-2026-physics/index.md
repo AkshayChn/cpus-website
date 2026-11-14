@@ -6,6 +6,7 @@ series: nobel-2026
 seriesOrder: 2
 language: kn
 author: CPUS
+tags: [nobel, physics, astronomy]
 cover: ./cover.jpg
 coverAlt: "ಫ್ರಾನ್ಸಿಸ್ ಹಾಲ್ಜೆನ್ ಅವರ ಭಾವಚಿತ್ರ ಮತ್ತು 2026ರ ಭೌತವಿಜ್ಞಾನದ ನೊಬೆಲ್"
 coverStyle: plate

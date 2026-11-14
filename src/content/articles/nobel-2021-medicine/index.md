@@ -6,6 +6,7 @@ series: nobel-2021
 seriesOrder: 1
 language: kn
 author: CPUS
+tags: [nobel, medicine, neuroscience]
 cover: ./cover.jpg
 coverAlt: "ಹಸಿರು ಹುಲ್ಲಿನ ಮೇಲೆ ನಡೆಯುತ್ತಿರುವ ಕಾಲುಗಳು, ನೊಬೆಲ್ ಪ್ರಶಸ್ತಿಯ ಚಿಹ್ನೆಯೊಂದಿಗೆ"
 featured: false

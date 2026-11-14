@@ -6,6 +6,7 @@ series: nobel-2026
 seriesOrder: 3
 language: kn
 author: CPUS
+tags: [nobel, chemistry]
 cover: ./cover.jpg
 coverAlt: "ಹೆನ್ರಿ ಕಗಾನ್ ಮತ್ತು ಕೆನ್ಸೊ ಸುಆಯ್ ಅವರ ಭಾವಚಿತ್ರಗಳು ಮತ್ತು 2026ರ ರಸಾಯನಶಾಸ್ತ್ರದ ನೊಬೆಲ್"
 coverStyle: plate

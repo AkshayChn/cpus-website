@@ -5,6 +5,7 @@ publishedAt: 2021-11-18
 series: pustakayana
 language: kn
 author: CPUS
+tags: [books, environment, pesticides, science-history]
 cover: ./cover.jpeg
 coverAlt: "ರಾಚೆಲ್ ಕಾರ್ಸನ್ ಮತ್ತು ಸೈಲೆಂಟ್ ಸ್ಪ್ರಿಂಗ್ ಪುಸ್ತಕದ ಮುಖಪುಟ"
 featured: true

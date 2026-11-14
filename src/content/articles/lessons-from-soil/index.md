@@ -5,6 +5,7 @@ publishedAt: 2022-12-04
 series: weekly-news
 language: kn
 author: CPUS
+tags: [soil, agriculture, environment, climate]
 cover: ./cover.jpg
 coverAlt: "ಮರ, ಹೊಲ ಮತ್ತು ಮಣ್ಣಿನ ಪದರಗಳ ದೃಶ್ಯ"
 coverStyle: plate

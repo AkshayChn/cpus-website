@@ -25,6 +25,7 @@ export const site = {
   footer: [
     { label: 'Articles', href: '/articles/' },
     { label: 'Series', href: '/series/' },
+    { label: 'Tags', href: '/tags/' },
     { label: 'About', href: '/about/' },
     { label: 'Resources', href: '/resources/' },
     { label: 'Contact', href: '/contact/' },

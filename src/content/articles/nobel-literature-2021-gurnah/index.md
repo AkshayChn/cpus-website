@@ -6,6 +6,7 @@ series: nobel-2021
 seriesOrder: 4
 language: kn
 author: CPUS
+tags: [nobel, literature, books]
 cover: ./cover.jpg
 coverAlt: "ವಸಾಫಿರಿ ಪತ್ರಿಕೆಯ 104ನೇ ಸಂಚಿಕೆಯ ಮುಖಪುಟ"
 featured: false
