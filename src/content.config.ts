@@ -21,6 +21,7 @@ const articles = defineCollection({
       author: z.string().default('CPUS'),
       cover: image().optional(),
       coverAlt: z.string().optional(),
+      coverStyle: z.enum(['hero', 'plate']).optional(),
       featured: z.boolean().default(false),
       draft: z.boolean().default(false),
     }),

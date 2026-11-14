@@ -51,7 +51,9 @@ const minutes = readingTime(article);
 const cover = article.data.cover;
 const coverIsPortrait = cover ? cover.height > cover.width : false;
 const coverIsSmall = cover ? cover.width < 700 : false;
-const coverIsPlate = Boolean(cover && (coverIsPortrait || coverIsSmall));
+const coverIsPlate = article.data.coverStyle
+  ? article.data.coverStyle === 'plate'
+  : Boolean(cover && (coverIsPortrait || coverIsSmall));
 ---
 
 <BaseLayout

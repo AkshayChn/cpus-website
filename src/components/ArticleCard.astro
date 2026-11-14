@@ -17,8 +17,8 @@ const href = url(`/articles/${article.id}/`);
 const isLarge = size === 'lg';
 const date = formatDate(article.data.publishedAt);
 const minutes = readingTime(article);
-const isPortrait = article.data.cover
-  ? article.data.cover.height > article.data.cover.width
+const isTall = article.data.cover
+  ? article.data.cover.height / article.data.cover.width > 0.8
   : false;
 ---
 
@@ -32,7 +32,7 @@ const isPortrait = article.data.cover
         sizes={isLarge ? '(min-width: 1024px) 900px, 100vw' : '(min-width: 768px) 360px, 100vw'}
         class:list={[
           'aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]',
-          isPortrait && 'object-top',
+          isTall && 'object-top',
         ]}
         loading={isLarge ? 'eager' : 'lazy'}
       />

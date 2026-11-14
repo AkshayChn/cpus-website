@@ -71,7 +71,9 @@ const startArticle = startHere.length === 1 ? startHere[0] : undefined;
           <p class="mt-2 text-xl text-muted" lang="kn">{series.data.titleKn}</p>
         )}
         <p class="mt-4 text-lg leading-relaxed text-muted">{series.data.description}</p>
-        <p class="mt-5 text-sm text-muted">{articles.length} articles</p>
+        <p class="mt-5 text-sm text-muted">
+          {articles.length} {articles.length === 1 ? 'article' : 'articles'}
+        </p>
       </div>
 
       {series.data.cover && (
