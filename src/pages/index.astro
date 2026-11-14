@@ -45,7 +45,7 @@ const countForSeries = (id: string): number => {
 
   <Container class="py-6 sm:py-10 lg:py-14">
     {lead && (
-      <section class="grid items-center gap-5 sm:gap-8 lg:grid-cols-[1.15fr_1fr] lg:gap-12">
+      <section class="grid gap-5 sm:gap-8 md:grid-cols-[1.1fr_1fr] md:items-center md:gap-8 lg:grid-cols-[1.15fr_1fr] lg:gap-12">
         <a href={url(`/articles/${lead.id}/`)} class="group block overflow-hidden rounded-2xl bg-accent-soft">
           {lead.data.cover ? (
             <Image
@@ -54,7 +54,7 @@ const countForSeries = (id: string): number => {
               widths={[700, 1100, 1500]}
               sizes="(min-width: 1024px) 700px, 100vw"
               class:list={[
-                'aspect-[16/9] w-full object-cover transition-transform duration-700 group-hover:scale-[1.02] sm:aspect-[4/3]',
+                'aspect-[16/9] w-full object-cover transition-transform duration-700 group-hover:scale-[1.02]',
                 leadIsTall && 'object-top',
               ]}
               loading="eager"
@@ -78,14 +78,14 @@ const countForSeries = (id: string): number => {
           </div>
 
           <h1
-            class="mt-3 text-3xl font-semibold leading-[1.15] tracking-tight text-ink sm:mt-4 sm:text-5xl"
+            class="mt-3 text-3xl font-semibold leading-[1.15] tracking-tight text-ink sm:mt-4 sm:text-4xl lg:text-5xl"
             lang={lead.data.language === 'kn' ? 'kn' : undefined}
           >
             <a href={url(`/articles/${lead.id}/`)} class="hover:text-accent">{lead.data.title}</a>
           </h1>
 
           <p
-            class="mt-3 text-base leading-relaxed text-muted sm:mt-4 sm:text-lg"
+            class="mt-3 text-base leading-relaxed text-muted sm:mt-4 lg:text-lg"
             lang={lead.data.language === 'kn' ? 'kn' : undefined}
           >
             {lead.data.summary}
