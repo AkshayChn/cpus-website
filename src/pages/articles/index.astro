@@ -1,0 +1,51 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Container from '../../components/Container.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import { getArticles, getSeries, getSeriesMap } from '../../lib/content';
+import { url } from '../../lib/url';
+
+const [articles, series, seriesMap] = await Promise.all([
+  getArticles(),
+  getSeries(),
+  getSeriesMap(),
+]);
+const visibleSeries = series.filter((entry) => !entry.data.parent);
+---
+
+<BaseLayout
+  title="Articles"
+  description="All articles from the Center for Public Understanding of Science."
+>
+  <Container class="py-10 sm:py-14">
+    <header class="max-w-2xl">
+      <p class="text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-highlight">The archive</p>
+      <h1 class="mt-2 text-4xl font-semibold tracking-tight text-ink sm:text-5xl">Articles</h1>
+      <p class="mt-4 text-lg leading-relaxed text-muted">
+        Science writing from CPUS, newest first. {articles.length} pieces and counting.
+      </p>
+    </header>
+
+    <nav class="mt-8 flex flex-wrap gap-2" aria-label="Browse by series">
+      {visibleSeries.map((entry) => (
+        <a
+          href={url(`/series/${entry.id}/`)}
+          class="rounded-full border border-rule px-3 py-1.5 text-sm text-muted transition-colors hover:border-accent hover:text-accent"
+        >
+          {entry.data.title}
+        </a>
+      ))}
+    </nav>
+  </Container>
+
+  <Container class="pb-12">
+    <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+      {articles.map((article) => (
+        <ArticleCard
+          article={article}
+          series={article.data.series ? seriesMap.get(article.data.series.id) : undefined}
+        />
+      ))}
+    </div>
+  </Container>
+</BaseLayout>

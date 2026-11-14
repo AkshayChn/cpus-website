@@ -1,0 +1,57 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Container from '../../components/Container.astro';
+import SeriesCard from '../../components/SeriesCard.astro';
+import { getArticles, getSeries } from '../../lib/content';
+
+const [series, articles] = await Promise.all([getSeries(), getArticles()]);
+const visible = series.filter((entry) => !entry.data.parent);
+const featured = visible.filter((entry) => entry.data.featured);
+const rest = visible.filter((entry) => !entry.data.featured);
+
+const countFor = (id: string) => {
+  const ids = new Set([
+    id,
+    ...series.filter((entry) => entry.data.parent?.id === id).map((entry) => entry.id),
+  ]);
+  return articles.filter((article) => article.data.series && ids.has(article.data.series.id)).length;
+};
+---
+
+<BaseLayout
+  title="Series"
+  description="Recurring CPUS series on plants, books, scientists, the Nobel Prizes, and more."
+>
+  <Container class="py-10 sm:py-14">
+    <header class="max-w-2xl">
+      <p class="text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-highlight">Recurring columns</p>
+      <h1 class="mt-2 text-4xl font-semibold tracking-tight text-ink sm:text-5xl">Series</h1>
+      <p class="mt-4 text-lg leading-relaxed text-muted">
+        Some ideas need more than one article. These are the threads we keep returning to.
+      </p>
+    </header>
+  </Container>
+
+  {featured.length > 0 && (
+    <Container class="pb-8">
+      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {featured.map((entry) => (
+          <SeriesCard series={entry} count={countFor(entry.id)} />
+        ))}
+      </div>
+    </Container>
+  )}
+
+  {rest.length > 0 && (
+    <Container class="py-8 sm:py-10">
+      <h2 class="mb-5 border-b border-rule pb-3 text-xl font-semibold tracking-tight text-ink">
+        More series
+      </h2>
+      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {rest.map((entry) => (
+          <SeriesCard series={entry} count={countFor(entry.id)} />
+        ))}
+      </div>
+    </Container>
+  )}
+</BaseLayout>

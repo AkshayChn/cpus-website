@@ -1,0 +1,114 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Container from '../../components/Container.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import SeriesCard from '../../components/SeriesCard.astro';
+import {
+  getArticles,
+  getSeries,
+  getSeriesChildren,
+  getSeriesMap,
+  getStartHereArticles,
+} from '../../lib/content';
+
+export async function getStaticPaths() {
+  const series = await getSeries();
+  return series.map((entry) => ({
+    params: { slug: entry.id },
+    props: { series: entry },
+  }));
+}
+
+const { series } = Astro.props;
+const [allArticles, startHere, children, seriesMap] = await Promise.all([
+  getArticles(),
+  getStartHereArticles(series),
+  getSeriesChildren(series.id),
+  getSeriesMap(),
+]);
+
+const seriesIds = new Set([series.id, ...children.map((child) => child.id)]);
+const articles = allArticles.filter(
+  (article) => article.data.series && seriesIds.has(article.data.series.id),
+);
+const countFor = (id: string) =>
+  allArticles.filter((article) => article.data.series?.id === id).length;
+---
+
+<BaseLayout
+  title={series.data.title}
+  description={series.data.description}
+  image={series.data.cover?.src}
+>
+  <Container class="py-10 sm:py-14">
+    <div class="grid items-center gap-8 lg:grid-cols-[1.3fr_1fr] lg:gap-12">
+      <div class="max-w-2xl">
+        <p class="text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-highlight">Series</p>
+        <h1 class="mt-2 text-4xl font-semibold tracking-tight text-ink sm:text-5xl">{series.data.title}</h1>
+        {series.data.titleKn && (
+          <p class="mt-2 text-xl text-muted" lang="kn">{series.data.titleKn}</p>
+        )}
+        <p class="mt-4 text-lg leading-relaxed text-muted">{series.data.description}</p>
+        <p class="mt-5 text-sm text-muted">{articles.length} articles</p>
+      </div>
+
+      {series.data.cover && (
+        <div class="overflow-hidden rounded-2xl bg-accent-soft">
+          <Image
+            src={series.data.cover}
+            alt=""
+            widths={[500, 900]}
+            sizes="(min-width: 1024px) 460px, 100vw"
+            class="aspect-[5/3] w-full object-cover"
+            loading="eager"
+          />
+        </div>
+      )}
+    </div>
+  </Container>
+
+  {startHere.length > 0 && (
+    <Container class="py-6 sm:py-8">
+      <div class="rounded-2xl border border-rule bg-surface p-6 sm:p-8">
+        <p class="text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-highlight">Start here</p>
+        <div class="mt-5 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {startHere.map((article) => (
+            <ArticleCard article={article} series={series} />
+          ))}
+        </div>
+      </div>
+    </Container>
+  )}
+
+  {children.length > 0 && (
+    <Container class="py-8 sm:py-10">
+      <h2 class="mb-5 border-b border-rule pb-3 text-xl font-semibold tracking-tight text-ink">
+        Yearly editions
+      </h2>
+      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {children.map((child) => (
+          <SeriesCard series={child} count={countFor(child.id)} />
+        ))}
+      </div>
+    </Container>
+  )}
+
+  <Container class="py-8 sm:py-10">
+    <h2 class="mb-5 border-b border-rule pb-3 text-xl font-semibold tracking-tight text-ink">
+      All articles
+    </h2>
+    {articles.length > 0 ? (
+      <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        {articles.map((article) => (
+          <ArticleCard
+            article={article}
+            series={article.data.series ? seriesMap.get(article.data.series.id) : undefined}
+          />
+        ))}
+      </div>
+    ) : (
+      <p class="text-muted">This series is still being written.</p>
+    )}
+  </Container>
+</BaseLayout>

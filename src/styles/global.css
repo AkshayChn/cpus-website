@@ -1,0 +1,237 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/noto-sans-kannada/wght.css';
+
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+@theme inline {
+  --font-sans: 'Noto Sans Kannada Variable', system-ui, sans-serif;
+
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-rule: var(--rule);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-highlight: var(--highlight);
+  --color-highlight-soft: var(--highlight-soft);
+}
+
+:root {
+  color-scheme: light;
+  --paper: #f7f4ee;
+  --surface: #fffdf8;
+  --ink: #1c1b19;
+  --muted: #6f6a61;
+  --rule: #ded8cc;
+  --accent: #1f5a45;
+  --accent-soft: #e3efe9;
+  --highlight: #b4552d;
+  --highlight-soft: #f6e7dd;
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+  --paper: #111311;
+  --surface: #181b18;
+  --ink: #f1eee7;
+  --muted: #aaa49a;
+  --rule: #2b302b;
+  --accent: #8fd3b5;
+  --accent-soft: #1c2a24;
+  --highlight: #e08b63;
+  --highlight-soft: #2c211c;
+}
+
+html {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  min-height: 100svh;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+html[data-banner-dismissed='true'] #construction-banner {
+  display: none;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--paper);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Article body typography, tuned for Kannada first. */
+.prose-cpus {
+  width: 100%;
+  max-width: 44rem;
+  margin-inline: auto;
+  font-size: 1.125rem;
+  line-height: 1.9;
+  color: var(--ink);
+}
+
+@media (min-width: 768px) {
+  .prose-cpus {
+    font-size: 1.1875rem;
+  }
+}
+
+.prose-cpus > * + * {
+  margin-top: 1.35em;
+}
+
+.prose-cpus h2,
+.prose-cpus h3,
+.prose-cpus h4 {
+  line-height: 1.35;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  scroll-margin-top: 6rem;
+}
+
+.prose-cpus h2 {
+  margin-top: 2.2em;
+  font-size: 1.45em;
+}
+
+.prose-cpus h3 {
+  margin-top: 1.9em;
+  font-size: 1.2em;
+}
+
+.prose-cpus h4 {
+  margin-top: 1.6em;
+  font-size: 1.05em;
+}
+
+.prose-cpus a {
+  color: var(--accent);
+  text-decoration-line: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.prose-cpus a:hover {
+  text-decoration-color: var(--accent);
+}
+
+.prose-cpus strong {
+  font-weight: 650;
+}
+
+.prose-cpus em {
+  font-style: normal;
+  font-weight: 600;
+}
+
+.prose-cpus ul,
+.prose-cpus ol {
+  padding-inline-start: 1.4em;
+}
+
+.prose-cpus li + li {
+  margin-top: 0.4em;
+}
+
+.prose-cpus blockquote {
+  margin-inline: 0;
+  padding-inline-start: 1.2rem;
+  border-inline-start: 3px solid var(--highlight);
+  color: var(--muted);
+}
+
+.prose-cpus figure {
+  margin: 2.2rem 0;
+}
+
+.prose-cpus figure img,
+.prose-cpus > p > img {
+  border-radius: 0.5rem;
+  width: 100%;
+}
+
+.prose-cpus figcaption {
+  margin-top: 0.6rem;
+  font-size: 0.82em;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.prose-cpus hr {
+  margin-block: 2.5rem;
+  border: 0;
+  border-top: 1px solid var(--rule);
+}
+
+.prose-cpus iframe {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  border-radius: 0.5rem;
+}
+
+.prose-cpus table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92em;
+}
+
+.prose-cpus th,
+.prose-cpus td {
+  padding: 0.5rem 0.65rem;
+  border-bottom: 1px solid var(--rule);
+  text-align: start;
+}
+
+.prose-cpus code {
+  font-size: 0.88em;
+  padding: 0.1em 0.3em;
+  border-radius: 0.25rem;
+  background: var(--accent-soft);
+}
+
+.prose-cpus pre {
+  overflow-x: auto;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background: var(--surface);
+}
+
+.prose-cpus pre code {
+  padding: 0;
+  background: none;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .prose-cpus {
+    max-width: none;
+    font-size: 11pt;
+  }
+}

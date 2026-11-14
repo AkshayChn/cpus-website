@@ -1,0 +1,52 @@
+---
+import { Image } from 'astro:assets';
+import type { Series } from '../lib/content';
+import { url } from '../lib/url';
+
+interface Props {
+  series: Series;
+  count?: number;
+}
+
+const { series, count } = Astro.props;
+const hasCover = Boolean(series.data.cover);
+const countLabel =
+  count === undefined ? 'Series' : count === 1 ? '1 article' : `${count} articles`;
+---
+
+<a
+  href={url(`/series/${series.id}/`)}
+  class="group flex flex-col overflow-hidden rounded-xl border border-rule bg-surface transition-colors hover:border-accent"
+>
+  <div class:list={['relative aspect-[5/3] overflow-hidden bg-accent-soft p-5', hasCover ? 'flex items-end' : 'flex flex-col justify-end']}>
+    {series.data.cover && (
+      <>
+        <Image
+          src={series.data.cover}
+          alt=""
+          widths={[400, 800]}
+          sizes="(min-width: 1024px) 360px, 50vw"
+          class="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+          loading="lazy"
+        />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" aria-hidden="true" />
+      </>
+    )}
+    <div class="relative z-10">
+      <p class:list={['text-xs font-semibold uppercase tracking-[0.12em]', hasCover ? 'text-white/80' : 'text-accent']}>
+        {countLabel}
+      </p>
+      <h3 class:list={['mt-2 text-2xl font-semibold leading-tight', hasCover ? 'text-white' : 'text-ink']}>
+        {series.data.title}
+      </h3>
+      {series.data.titleKn && (
+        <p class:list={['mt-1 text-sm', hasCover ? 'text-white/80' : 'text-muted']}>
+          {series.data.titleKn}
+        </p>
+      )}
+    </div>
+  </div>
+  <p class="border-t border-rule p-5 text-sm leading-relaxed text-muted">
+    {series.data.description}
+  </p>
+</a>

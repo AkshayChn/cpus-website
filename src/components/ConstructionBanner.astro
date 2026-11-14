@@ -1,0 +1,32 @@
+---
+---
+
+<div
+  id="construction-banner"
+  class="no-print border-b border-rule bg-accent-soft"
+  role="region"
+  aria-label="Site announcement"
+>
+  <div class="mx-auto flex max-w-7xl items-start gap-3 px-4 py-2.5 sm:items-center sm:px-6 lg:px-8">
+    <p class="flex-1 text-sm leading-relaxed text-ink">
+      <span class="font-semibold">This is the new CPUS website.</span>{' '}
+      It is still under construction — some content and features are on the way.
+    </p>
+    <button
+      type="button"
+      data-banner-dismiss
+      class="-mr-1.5 inline-flex size-11 shrink-0 items-center justify-center rounded-full text-muted transition-colors hover:bg-paper/60 hover:text-ink sm:size-9"
+      aria-label="Dismiss announcement"
+    >
+      <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M6 6l12 12M18 6 6 18" />
+      </svg>
+    </button>
+  </div>
+</div>
+
+<script>
+  import { initBanner } from '../scripts/banner';
+
+  initBanner();
+</script>

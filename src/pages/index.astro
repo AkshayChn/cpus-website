@@ -1,0 +1,139 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ConstructionBanner from '../components/ConstructionBanner.astro';
+import Container from '../components/Container.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import SeriesCard from '../components/SeriesCard.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import {
+  formatDate,
+  getArticles,
+  getFeaturedArticles,
+  getSeries,
+  getSeriesMap,
+  readingTime,
+} from '../lib/content';
+import { url } from '../lib/url';
+
+const [articles, featured, series, seriesMap] = await Promise.all([
+  getArticles(),
+  getFeaturedArticles(1),
+  getSeries(),
+  getSeriesMap(),
+]);
+
+const lead = featured[0] ?? articles[0];
+const latest = articles.filter((article) => article.id !== lead?.id).slice(0, 3);
+const featuredSeries = series.filter((entry) => entry.data.featured).slice(0, 3);
+const leadSeries = lead?.data.series ? seriesMap.get(lead.data.series.id) : undefined;
+
+const countForSeries = (id: string): number => {
+  const ids = new Set([
+    id,
+    ...series.filter((entry) => entry.data.parent?.id === id).map((entry) => entry.id),
+  ]);
+  return articles.filter((article) => article.data.series && ids.has(article.data.series.id)).length;
+};
+---
+
+<BaseLayout description="Science writing in Kannada, from the Center for Public Understanding of Science.">
+  <ConstructionBanner slot="banner" />
+
+  <Container class="py-10 sm:py-14">
+    {lead && (
+      <section class="grid items-center gap-8 lg:grid-cols-[1.15fr_1fr] lg:gap-12">
+        <a href={url(`/articles/${lead.id}/`)} class="group block overflow-hidden rounded-2xl bg-accent-soft">
+          {lead.data.cover ? (
+            <Image
+              src={lead.data.cover}
+              alt={lead.data.coverAlt ?? ''}
+              widths={[700, 1100, 1500]}
+              sizes="(min-width: 1024px) 700px, 100vw"
+              class="aspect-[4/3] w-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+              loading="eager"
+            />
+          ) : (
+            <div class="aspect-[4/3] bg-accent-soft" />
+          )}
+        </a>
+
+        <div class="max-w-xl">
+          <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-highlight">
+            {leadSeries ? (
+              <a href={url(`/series/${leadSeries.id}/`)} class="hover:underline">
+                {leadSeries.data.title}
+              </a>
+            ) : (
+              <span>From CPUS</span>
+            )}
+            <span class="text-rule">/</span>
+            <time datetime={lead.data.publishedAt.toISOString()}>{formatDate(lead.data.publishedAt)}</time>
+          </div>
+
+          <h1 class="mt-4 text-4xl font-semibold leading-[1.15] tracking-tight text-ink sm:text-5xl">
+            <a href={url(`/articles/${lead.id}/`)} class="hover:text-accent">{lead.data.title}</a>
+          </h1>
+
+          <p class="mt-4 text-lg leading-relaxed text-muted">{lead.data.summary}</p>
+
+          <div class="mt-6 flex flex-wrap items-center gap-4 text-sm text-muted">
+            <span>{readingTime(lead)} min read</span>
+            {lead.data.language === 'kn' && <span lang="kn">ಕನ್ನಡ</span>}
+            <a
+              href={url(`/articles/${lead.id}/`)}
+              class="inline-flex items-center gap-1.5 font-semibold text-accent hover:underline"
+            >
+              Read the story <span aria-hidden="true">→</span>
+            </a>
+          </div>
+        </div>
+      </section>
+    )}
+  </Container>
+
+  <Container class="py-8 sm:py-10">
+    <SectionHeading kicker="Fresh writing" title="Latest articles" href="/articles/" />
+    <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+      {latest.map((article) => (
+        <ArticleCard
+          article={article}
+          series={article.data.series ? seriesMap.get(article.data.series.id) : undefined}
+        />
+      ))}
+    </div>
+  </Container>
+
+  <Container class="py-10 sm:py-14">
+    <SectionHeading kicker="Recurring columns" title="Series" href="/series/" />
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {featuredSeries.map((entry) => (
+        <SeriesCard
+          series={entry}
+          count={countForSeries(entry.id)}
+        />
+      ))}
+    </div>
+  </Container>
+
+  <Container class="py-10 sm:py-16">
+    <div class="grid gap-6 rounded-2xl border border-rule bg-surface p-6 sm:p-10 lg:grid-cols-[1fr_auto] lg:items-end">
+      <div class="max-w-2xl">
+        <p class="text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-highlight">About CPUS</p>
+        <h2 class="mt-2 text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
+          Science belongs in public life.
+        </h2>
+        <p class="mt-3 text-base leading-relaxed text-muted">
+          The Center for Public Understanding of Science writes, translates, and creates spaces for
+          scientific ideas in Kannada and beyond.
+        </p>
+      </div>
+      <a
+        href={url('/about/')}
+        class="inline-flex items-center gap-1.5 text-sm font-semibold text-accent hover:underline"
+      >
+        More about CPUS <span aria-hidden="true">→</span>
+      </a>
+    </div>
+  </Container>
+</BaseLayout>

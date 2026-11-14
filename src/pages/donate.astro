@@ -1,0 +1,43 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Container from '../components/Container.astro';
+import { site } from '../data/site';
+---
+
+<BaseLayout title="Donate" description="Support the public understanding of science.">
+  <Container class="py-10 sm:py-14">
+    <div class="mx-auto max-w-2xl">
+      <header class="border-b border-rule pb-6">
+        <p class="text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-highlight">Support</p>
+        <h1 class="mt-2 text-4xl font-semibold tracking-tight text-ink sm:text-5xl">Donate</h1>
+        <p class="mt-4 text-lg leading-relaxed text-muted">
+          CPUS is a small, independent initiative. Contributions help us keep the writing free and
+          the archive open.
+        </p>
+      </header>
+
+      <div class="mt-8 rounded-2xl border border-rule bg-surface p-6 sm:p-8">
+        <h2 class="text-sm font-semibold uppercase tracking-[0.12em] text-muted">Bank transfer</h2>
+        <dl class="mt-4 grid gap-3 text-sm sm:grid-cols-[8rem_1fr]">
+          <dt class="text-muted">Account name</dt>
+          <dd class="text-ink">{site.donate.accountName}</dd>
+          <dt class="text-muted">Account number</dt>
+          <dd class="font-mono text-ink">{site.donate.accountNumber}</dd>
+          <dt class="text-muted">IFSC</dt>
+          <dd class="font-mono text-ink">{site.donate.ifsc}</dd>
+          <dt class="text-muted">Bank</dt>
+          <dd class="text-ink">{site.donate.bank}</dd>
+          <dt class="text-muted">Branch</dt>
+          <dd class="text-ink">{site.donate.branch}</dd>
+          <dt class="text-muted">Branch address</dt>
+          <dd class="text-ink">{site.donate.address}</dd>
+        </dl>
+      </div>
+
+      <p class="mt-6 text-sm leading-relaxed text-muted">
+        Please write to <a href={`mailto:${site.email}`} class="text-accent hover:underline">{site.email}</a>{' '}
+        after a transfer so we can acknowledge it.
+      </p>
+    </div>
+  </Container>
+</BaseLayout>

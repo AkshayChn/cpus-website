@@ -1,0 +1,57 @@
+---
+import { Image } from 'astro:assets';
+import type { Article } from '../lib/content';
+import { formatDate, readingTime } from '../lib/content';
+import { url } from '../lib/url';
+import type { Series } from '../lib/content';
+
+interface Props {
+  article: Article;
+  series?: Series;
+  size?: 'sm' | 'md' | 'lg';
+}
+
+const { article, series, size = 'md' } = Astro.props;
+
+const href = url(`/articles/${article.id}/`);
+const isLarge = size === 'lg';
+const date = formatDate(article.data.publishedAt);
+const minutes = readingTime(article);
+---
+
+<article class:list={['group flex flex-col', isLarge ? 'gap-5' : 'gap-3']}>
+  <a href={href} class="block overflow-hidden rounded-xl bg-accent-soft">
+    {article.data.cover ? (
+      <Image
+        src={article.data.cover}
+        alt={article.data.coverAlt ?? ''}
+        widths={isLarge ? [600, 1000, 1400] : [360, 720]}
+        sizes={isLarge ? '(min-width: 1024px) 900px, 100vw' : '(min-width: 768px) 360px, 100vw'}
+        class="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+        loading={isLarge ? 'eager' : 'lazy'}
+      />
+    ) : (
+      <div class="flex aspect-[16/10] items-center justify-center bg-accent-soft p-6 text-center">
+        <span class="text-2xl font-semibold text-accent">{article.data.title}</span>
+      </div>
+    )}
+  </a>
+
+  <div class="flex flex-col gap-2">
+    <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-accent">
+      {series && <a href={url(`/series/${series.id}/`)} class="hover:underline">{series.data.title}</a>}
+      <span class="text-rule">/</span>
+      <time datetime={article.data.publishedAt.toISOString()}>{date}</time>
+    </div>
+
+    <h3 class:list={['font-semibold leading-snug tracking-tight text-ink', isLarge ? 'text-3xl sm:text-4xl' : 'text-xl']}>
+      <a href={href} class="transition-colors group-hover:text-accent">{article.data.title}</a>
+    </h3>
+
+    <p class:list={['text-sm leading-relaxed text-muted', isLarge ? 'max-w-2xl text-base' : 'line-clamp-3']}>
+      {article.data.summary}
+    </p>
+
+    <p class="text-xs text-muted">{minutes} min read</p>
+  </div>
+</article>

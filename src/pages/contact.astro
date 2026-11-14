@@ -1,0 +1,51 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Container from '../components/Container.astro';
+import { site } from '../data/site';
+---
+
+<BaseLayout title="Contact" description="Get in touch with CPUS.">
+  <Container class="py-10 sm:py-14">
+    <div class="mx-auto max-w-2xl">
+      <header class="border-b border-rule pb-6">
+        <p class="text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-highlight">Contact</p>
+        <h1 class="mt-2 text-4xl font-semibold tracking-tight text-ink sm:text-5xl">Talk to us</h1>
+        <p class="mt-4 text-lg leading-relaxed text-muted">
+          Questions, corrections, collaborations, or a book we should read — write to us.
+        </p>
+      </header>
+
+      <div class="mt-8 grid gap-8 sm:grid-cols-2">
+        <div>
+          <h2 class="text-sm font-semibold uppercase tracking-[0.12em] text-muted">Email</h2>
+          <a href={`mailto:${site.email}`} class="mt-2 block text-lg text-accent hover:underline">
+            {site.email}
+          </a>
+          <a href={`mailto:${site.directorEmail}`} class="mt-1 block text-sm text-muted hover:text-accent">
+            {site.directorEmail}
+          </a>
+          <h2 class="mt-5 text-sm font-semibold uppercase tracking-[0.12em] text-muted">Phone</h2>
+          {site.phones.map((phone) => (
+            <a
+              href={`tel:${phone.replace(/\s/g, '')}`}
+              class="mt-2 block text-muted hover:text-accent"
+            >
+              {phone}
+            </a>
+          ))}
+        </div>
+
+        <div>
+          <h2 class="text-sm font-semibold uppercase tracking-[0.12em] text-muted">Address</h2>
+          <address class="mt-2 space-y-1 text-sm not-italic leading-relaxed text-muted">
+            {site.address.lines.map((line) => <span class="block">{line}</span>)}
+          </address>
+        </div>
+      </div>
+
+      <p class="mt-10 rounded-xl border border-rule bg-surface p-4 text-sm leading-relaxed text-muted">
+        A contact form will be added later. For now, email is the most reliable way to reach us.
+      </p>
+    </div>
+  </Container>
+</BaseLayout>
