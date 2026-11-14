@@ -71,11 +71,19 @@ const countForSeries = (id: string): number => {
             <time datetime={lead.data.publishedAt.toISOString()}>{formatDate(lead.data.publishedAt)}</time>
           </div>
 
-          <h1 class="mt-4 text-4xl font-semibold leading-[1.15] tracking-tight text-ink sm:text-5xl">
+          <h1
+            class="mt-4 text-4xl font-semibold leading-[1.15] tracking-tight text-ink sm:text-5xl"
+            lang={lead.data.language === 'kn' ? 'kn' : undefined}
+          >
             <a href={url(`/articles/${lead.id}/`)} class="hover:text-accent">{lead.data.title}</a>
           </h1>
 
-          <p class="mt-4 text-lg leading-relaxed text-muted">{lead.data.summary}</p>
+          <p
+            class="mt-4 text-lg leading-relaxed text-muted"
+            lang={lead.data.language === 'kn' ? 'kn' : undefined}
+          >
+            {lead.data.summary}
+          </p>
 
           <div class="mt-6 flex flex-wrap items-center gap-4 text-sm text-muted">
             <span>{readingTime(lead)} min read</span>

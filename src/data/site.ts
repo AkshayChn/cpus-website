@@ -44,6 +44,6 @@ export const site = {
     ifsc: 'BKID0008436',
     bank: 'Bank of India',
     branch: 'Sahakara Nagar Branch',
-    address: 'Bengaluru-560092, Karnataka (State), India',
+    address: 'Bengaluru-560092, Karnataka(State), India',
   },
 } as const;

@@ -32,7 +32,12 @@ const minutes = readingTime(article);
       />
     ) : (
       <div class="flex aspect-[16/10] items-center justify-center bg-accent-soft p-6 text-center">
-        <span class="text-2xl font-semibold text-accent">{article.data.title}</span>
+        <span
+          class="text-2xl font-semibold text-accent"
+          lang={article.data.language === 'kn' ? 'kn' : undefined}
+        >
+          {article.data.title}
+        </span>
       </div>
     )}
   </a>
@@ -44,11 +49,17 @@ const minutes = readingTime(article);
       <time datetime={article.data.publishedAt.toISOString()}>{date}</time>
     </div>
 
-    <h3 class:list={['font-semibold leading-snug tracking-tight text-ink', isLarge ? 'text-3xl sm:text-4xl' : 'text-xl']}>
+    <h3
+      class:list={['font-semibold leading-snug tracking-tight text-ink', isLarge ? 'text-3xl sm:text-4xl' : 'text-xl']}
+      lang={article.data.language === 'kn' ? 'kn' : undefined}
+    >
       <a href={href} class="transition-colors group-hover:text-accent">{article.data.title}</a>
     </h3>
 
-    <p class:list={['text-sm leading-relaxed text-muted', isLarge ? 'max-w-2xl text-base' : 'line-clamp-3']}>
+    <p
+      class:list={['text-sm leading-relaxed text-muted', isLarge ? 'max-w-2xl text-base' : 'line-clamp-3']}
+      lang={article.data.language === 'kn' ? 'kn' : undefined}
+    >
       {article.data.summary}
     </p>
 
