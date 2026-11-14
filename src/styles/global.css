@@ -32,7 +32,8 @@
 :root {
   color-scheme: light;
   --font-ui: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  --font-kn: 'Noto Serif Kannada Subset', var(--font-ui);
+  --font-serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', 'Times New Roman', serif;
+  --font-kn: 'Noto Serif Kannada Subset', var(--font-serif);
   --paper: #f7f4ee;
   --surface: #fffdf8;
   --ink: #1c1b19;
@@ -46,15 +47,15 @@
 
 [data-theme='dark'] {
   color-scheme: dark;
-  --paper: #111311;
-  --surface: #181b18;
-  --ink: #f1eee7;
-  --muted: #aaa49a;
-  --rule: #2b302b;
-  --accent: #8fd3b5;
-  --accent-soft: #1c2a24;
-  --highlight: #e08b63;
-  --highlight-soft: #2c211c;
+  --paper: #22251f;
+  --surface: #2a2e26;
+  --ink: #f3efe6;
+  --muted: #c0b9ad;
+  --rule: #464c40;
+  --accent: #9bd9bd;
+  --accent-soft: #2d3d33;
+  --highlight: #e8a078;
+  --highlight-soft: #443027;
 }
 
 html {
@@ -77,10 +78,16 @@ html {
 }
 
 body {
+  display: flex;
+  flex-direction: column;
   margin: 0;
   min-height: 100svh;
   background: var(--paper);
   color: var(--ink);
+}
+
+main {
+  flex: 1 0 auto;
 }
 
 html[data-banner-dismissed='true'] #construction-banner {
@@ -113,6 +120,7 @@ img {
   width: 100%;
   max-width: 44rem;
   margin-inline: auto;
+  font-family: var(--font-kn);
   font-size: 1.125rem;
   line-height: 1.9;
   color: var(--ink);
