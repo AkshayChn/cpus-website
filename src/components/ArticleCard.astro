@@ -17,6 +17,9 @@ const href = url(`/articles/${article.id}/`);
 const isLarge = size === 'lg';
 const date = formatDate(article.data.publishedAt);
 const minutes = readingTime(article);
+const isPortrait = article.data.cover
+  ? article.data.cover.height > article.data.cover.width
+  : false;
 ---
 
 <article class:list={['group flex flex-col', isLarge ? 'gap-5' : 'gap-3']}>
@@ -27,7 +30,10 @@ const minutes = readingTime(article);
         alt={article.data.coverAlt ?? ''}
         widths={isLarge ? [600, 1000, 1400] : [360, 720]}
         sizes={isLarge ? '(min-width: 1024px) 900px, 100vw' : '(min-width: 768px) 360px, 100vw'}
-        class="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+        class:list={[
+          'aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]',
+          isPortrait && 'object-top',
+        ]}
         loading={isLarge ? 'eager' : 'lazy'}
       />
     ) : (

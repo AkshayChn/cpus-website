@@ -27,6 +27,9 @@ const lead = featured[0] ?? articles[0];
 const latest = articles.filter((article) => article.id !== lead?.id).slice(0, 3);
 const featuredSeries = series.filter((entry) => entry.data.featured).slice(0, 3);
 const leadSeries = lead?.data.series ? seriesMap.get(lead.data.series.id) : undefined;
+const leadIsPortrait = lead?.data.cover
+  ? lead.data.cover.height > lead.data.cover.width
+  : false;
 
 const countForSeries = (id: string): number => {
   const ids = new Set([
@@ -50,7 +53,10 @@ const countForSeries = (id: string): number => {
               alt={lead.data.coverAlt ?? ''}
               widths={[700, 1100, 1500]}
               sizes="(min-width: 1024px) 700px, 100vw"
-              class="aspect-[4/3] w-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+              class:list={[
+                'aspect-[4/3] w-full object-cover transition-transform duration-700 group-hover:scale-[1.02]',
+                leadIsPortrait && 'object-top',
+              ]}
               loading="eager"
             />
           ) : (

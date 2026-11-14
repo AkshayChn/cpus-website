@@ -3,7 +3,9 @@ import { Image } from 'astro:assets';
 import { render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Container from '../../components/Container.astro';
-import ArticleCard from '../../components/ArticleCard.astro';
+import ReadingRail from '../../components/article/ReadingRail.astro';
+import MobileReadingBar from '../../components/article/MobileReadingBar.astro';
+import SeriesScroller from '../../components/article/SeriesScroller.astro';
 import {
   formatDate,
   getArticles,
@@ -26,143 +28,201 @@ const { article } = Astro.props;
 const seriesMap = await getSeriesMap();
 const series = article.data.series ? seriesMap.get(article.data.series.id) : undefined;
 const { Content, headings } = await render(article);
-const related = await getRelatedArticles(article, 3);
 const toc = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
 
 const seriesArticles = article.data.series
   ? await getArticlesBySeries(article.data.series.id)
   : [];
-const index = seriesArticles.findIndex((entry) => entry.id === article.id);
-const previous = index > 0 ? seriesArticles[index - 1] : undefined;
-const next = index >= 0 && index < seriesArticles.length - 1 ? seriesArticles[index + 1] : undefined;
+const seriesIndex = seriesArticles.findIndex((entry) => entry.id === article.id);
+const seriesOthers = seriesArticles.filter((entry) => entry.id !== article.id);
+
+const related = await getRelatedArticles(article, 3);
+const endArticles = seriesOthers.length > 0 ? seriesOthers : related;
+const endTitle =
+  seriesOthers.length > 0 && series
+    ? `Continue reading in ${series.data.title}`
+    : 'More to read';
+const endKicker = seriesOthers.length > 0 ? 'From the series' : 'Keep reading';
+const endLinkHref =
+  seriesOthers.length > 0 && series ? `/series/${series.id}/` : '/articles/';
+const endLinkLabel = seriesOthers.length > 0 && series ? 'View series' : 'All articles';
+
+const minutes = readingTime(article);
+const cover = article.data.cover;
+const coverIsPortrait = cover ? cover.height > cover.width : false;
+const coverIsSmall = cover ? cover.width < 700 : false;
+const coverIsPlate = Boolean(cover && (coverIsPortrait || coverIsSmall));
 ---
 
 <BaseLayout
   title={article.data.title}
   description={article.data.summary}
   image={article.data.cover?.src}
+  imageAlt={article.data.coverAlt}
   type="article"
+  publishedTime={article.data.publishedAt}
+  modifiedTime={article.data.updatedAt}
 >
-  <Container class="py-8 sm:py-12">
-    <article class="mx-auto max-w-4xl">
-      <header class="mx-auto max-w-3xl text-center">
-        <div class="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-highlight">
-          {series ? (
-            <a href={url(`/series/${series.id}/`)} class="hover:underline">{series.data.title}</a>
-          ) : (
-            <span>CPUS</span>
-          )}
-          <span class="text-rule">/</span>
-          <time datetime={article.data.publishedAt.toISOString()}>{formatDate(article.data.publishedAt)}</time>
-        </div>
-
-        <h1
-          class="mt-4 text-3xl font-semibold leading-[1.2] tracking-tight text-ink sm:text-4xl lg:text-5xl"
-          lang={article.data.language === 'kn' ? 'kn' : undefined}
-        >
-          {article.data.title}
-        </h1>
-
-        <p
-          class="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-muted"
-          lang={article.data.language === 'kn' ? 'kn' : undefined}
-        >
-          {article.data.summary}
-        </p>
-
-        <div class="mt-5 flex flex-wrap items-center justify-center gap-3 text-sm text-muted">
-          <span>{article.data.author}</span>
-          <span class="text-rule">·</span>
-          <span>{readingTime(article)} min read</span>
-          {article.data.language === 'kn' && (
-            <>
-              <span class="text-rule">·</span>
-              <span lang="kn">ಕನ್ನಡ</span>
-            </>
-          )}
-        </div>
-      </header>
-
-      {article.data.cover && (
-        <figure class="mt-8 overflow-hidden rounded-2xl bg-accent-soft sm:mt-10">
-          <Image
-            src={article.data.cover}
-            alt={article.data.coverAlt ?? ''}
-            widths={[800, 1200, 1600]}
-            sizes="(min-width: 1024px) 1000px, 100vw"
-            class="aspect-[16/9] w-full object-cover"
-            loading="eager"
-          />
-        </figure>
-      )}
-
-      {toc.length > 1 && (
-        <nav
-          class="mx-auto mt-10 max-w-2xl rounded-xl border border-rule bg-surface p-5"
-          aria-label="Table of contents"
-          lang={article.data.language === 'kn' ? 'kn' : undefined}
-        >
-          <p class="text-xs font-semibold uppercase tracking-[0.12em] text-muted">In this article</p>
-          <ol class="mt-3 space-y-1.5 text-sm">
-            {toc.map((heading) => (
-              <li class:list={[heading.depth === 3 && 'pl-4']}>
-                <a href={`#${heading.slug}`} class="text-ink hover:text-accent">{heading.text}</a>
-              </li>
-            ))}
-          </ol>
-        </nav>
-      )}
-
-      <div class="prose-cpus mt-10 sm:mt-12" lang={article.data.language === 'kn' ? 'kn' : 'en'}>
-        <Content />
-      </div>
-
-      {(previous || next) && (
-        <nav class="mx-auto mt-14 max-w-3xl border-t border-rule pt-6" aria-label="More from this series">
-          <p class="text-xs font-semibold uppercase tracking-[0.12em] text-muted">More from this series</p>
-          <div class="mt-3 grid gap-2 sm:grid-cols-2">
-            {previous && (
-              <a href={url(`/articles/${previous.id}/`)} class="rounded-lg border border-rule p-4 hover:border-accent">
-                <span class="text-xs text-muted">Previous</span>
-                <span
-                  class="mt-1 block text-sm font-medium text-ink"
-                  lang={previous.data.language === 'kn' ? 'kn' : undefined}
-                >
-                  {previous.data.title}
-                </span>
-              </a>
+  <Container class="pt-8 pb-28 sm:pt-10 md:pb-12 lg:pt-14 lg:pb-16">
+    <div class="lg:grid lg:grid-cols-[minmax(0,40rem)_13rem] lg:justify-center lg:gap-12 xl:grid-cols-[minmax(0,44rem)_15rem] xl:gap-20">
+      <article class="min-w-0" data-article>
+        <header class="max-w-3xl" data-article-header>
+          <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-highlight">
+            {series ? (
+              <a href={url(`/series/${series.id}/`)} class="hover:underline">{series.data.title}</a>
+            ) : (
+              <span>CPUS</span>
             )}
-            {next && (
-              <a href={url(`/articles/${next.id}/`)} class="rounded-lg border border-rule p-4 text-right hover:border-accent sm:col-start-2">
-                <span class="text-xs text-muted">Next</span>
-                <span
-                  class="mt-1 block text-sm font-medium text-ink"
-                  lang={next.data.language === 'kn' ? 'kn' : undefined}
-                >
-                  {next.data.title}
+            <span class="text-rule" aria-hidden="true">/</span>
+            <time datetime={article.data.publishedAt.toISOString()}>
+              {formatDate(article.data.publishedAt)}
+            </time>
+            {article.data.updatedAt && (
+              <>
+                <span class="text-rule" aria-hidden="true">/</span>
+                <span class="normal-case tracking-normal text-muted">
+                  Updated <time datetime={article.data.updatedAt.toISOString()}>{formatDate(article.data.updatedAt)}</time>
                 </span>
-              </a>
+              </>
             )}
           </div>
-        </nav>
-      )}
-    </article>
+
+          <h1
+            class="mt-3 text-[2rem] font-semibold leading-[1.18] tracking-tight text-ink sm:text-5xl lg:text-[3.25rem]"
+            lang={article.data.language === 'kn' ? 'kn' : undefined}
+          >
+            {article.data.title}
+          </h1>
+
+          <p
+            class="mt-4 max-w-2xl text-lg leading-relaxed text-muted"
+            lang={article.data.language === 'kn' ? 'kn' : undefined}
+          >
+            {article.data.summary}
+          </p>
+
+          <div class="mt-5 flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-rule pt-4 text-sm text-muted">
+            <span>{article.data.author}</span>
+            <span class="text-rule" aria-hidden="true">·</span>
+            <span>{minutes} min read</span>
+            {article.data.language === 'kn' && (
+              <>
+                <span class="text-rule" aria-hidden="true">·</span>
+                <span lang="kn">ಕನ್ನಡ</span>
+              </>
+            )}
+            {seriesArticles.length > 1 && seriesIndex >= 0 && (
+              <span class="contents lg:hidden">
+                <span class="text-rule" aria-hidden="true">·</span>
+                <span>Part {seriesIndex + 1} of {seriesArticles.length}</span>
+              </span>
+            )}
+            <button
+              type="button"
+              data-share-button
+              data-share-title={article.data.title}
+              data-share-url={new URL(Astro.url.pathname, Astro.site).toString()}
+              class="ml-auto hidden items-center gap-1.5 text-sm font-medium text-accent hover:underline md:inline-flex lg:hidden"
+            >
+              <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                <path d="M12 15V4m0 0L8 8m4-4 4 4" />
+                <path d="M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5" />
+              </svg>
+              <span data-share-label>Share</span>
+            </button>
+          </div>
+        </header>
+
+        {cover && (
+          coverIsPlate ? (
+            <figure class="mt-8 sm:mt-10">
+              <div class="mx-auto flex w-fit max-w-full justify-center rounded-2xl border border-rule bg-accent-soft p-4 sm:p-5">
+                <Image
+                  src={cover}
+                  alt={article.data.coverAlt ?? ''}
+                  widths={[300, 500, 700]}
+                  sizes="(min-width: 1024px) 420px, 80vw"
+                  class="max-h-[30rem] w-auto max-w-full rounded-lg shadow-sm"
+                  loading="eager"
+                />
+              </div>
+              {article.data.coverAlt && (
+                <figcaption class="mt-2 text-center text-xs leading-relaxed text-muted">
+                  {article.data.coverAlt}
+                </figcaption>
+              )}
+            </figure>
+          ) : (
+            <figure class="mt-8 overflow-hidden rounded-2xl bg-accent-soft sm:mt-10">
+              <Image
+                src={cover}
+                alt={article.data.coverAlt ?? ''}
+                widths={[700, 1000, 1400]}
+                sizes="(min-width: 1280px) 704px, (min-width: 1024px) 640px, 100vw"
+                class="aspect-[16/9] w-full object-cover"
+                loading="eager"
+              />
+            </figure>
+          )
+        )}
+
+        {toc.length > 0 && (
+          <details class="mt-8 hidden rounded-xl border border-rule bg-surface p-4 md:block lg:hidden">
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold text-ink [&::-webkit-details-marker]:hidden">
+              <span>Contents</span>
+              <span class="text-xs font-normal text-muted">
+                {toc.length} {toc.length === 1 ? 'section' : 'sections'}
+              </span>
+            </summary>
+            <ol class="mt-3 space-y-1.5 text-sm">
+              {toc.map((heading) => (
+                <li class:list={[heading.depth === 3 && 'pl-4']}>
+                  <a href={`#${heading.slug}`} class="text-muted hover:text-accent">
+                    {heading.text}
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </details>
+        )}
+
+        <div
+          class="prose-cpus mt-10 sm:mt-12"
+          lang={article.data.language === 'kn' ? 'kn' : 'en'}
+          data-reading-body
+        >
+          <Content />
+        </div>
+
+        <SeriesScroller
+          articles={endArticles}
+          series={seriesOthers.length > 0 ? series : undefined}
+          title={endTitle}
+          kicker={endKicker}
+          linkHref={endLinkHref}
+          linkLabel={endLinkLabel}
+        />
+      </article>
+
+      <ReadingRail
+        article={article}
+        series={series}
+        seriesArticles={seriesArticles}
+        toc={toc}
+      />
+    </div>
   </Container>
 
-  {related.length > 0 && (
-    <Container class="py-10 sm:py-14">
-      <div class="mb-6 border-b border-rule pb-3">
-        <p class="text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-highlight">Keep reading</p>
-        <h2 class="mt-1 text-2xl font-semibold tracking-tight text-ink">More to read</h2>
-      </div>
-      <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-        {related.map((entry) => (
-          <ArticleCard
-            article={entry}
-            series={entry.data.series ? seriesMap.get(entry.data.series.id) : undefined}
-          />
-        ))}
-      </div>
-    </Container>
-  )}
+  <MobileReadingBar
+    article={article}
+    series={series}
+    seriesArticles={seriesArticles}
+    toc={toc}
+  />
 </BaseLayout>
+
+<script>
+  import { initArticle } from '../../scripts/article';
+
+  initArticle();
+</script>

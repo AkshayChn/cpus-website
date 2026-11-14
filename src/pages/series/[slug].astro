@@ -5,12 +5,15 @@ import Container from '../../components/Container.astro';
 import ArticleCard from '../../components/ArticleCard.astro';
 import SeriesCard from '../../components/SeriesCard.astro';
 import {
+  formatDate,
   getArticles,
   getSeries,
   getSeriesChildren,
   getSeriesMap,
   getStartHereArticles,
+  readingTime,
 } from '../../lib/content';
+import { url } from '../../lib/url';
 
 export async function getStaticPaths() {
   const series = await getSeries();
@@ -32,8 +35,26 @@ const seriesIds = new Set([series.id, ...children.map((child) => child.id)]);
 const articles = allArticles.filter(
   (article) => article.data.series && seriesIds.has(article.data.series.id),
 );
+const readingArticles = [...articles].sort((a, b) => {
+  const aOrder = a.data.seriesOrder ?? Number.MAX_SAFE_INTEGER;
+  const bOrder = b.data.seriesOrder ?? Number.MAX_SAFE_INTEGER;
+
+  return aOrder - bOrder || a.data.publishedAt.getTime() - b.data.publishedAt.getTime();
+});
 const countFor = (id: string) =>
   allArticles.filter((article) => article.data.series?.id === id).length;
+
+const startHereIds = new Set(startHere.map((entry) => entry.id));
+const remaining = readingArticles.filter((entry) => !startHereIds.has(entry.id));
+const showStartHere = startHere.length > 0 && remaining.length > 0;
+const startHereInSeries = startHere.filter((entry) =>
+  readingArticles.some((article) => article.id === entry.id),
+);
+const orderedArticles = startHereInSeries.length > 0
+  ? [...startHereInSeries, ...remaining]
+  : readingArticles;
+const listingArticles = showStartHere ? remaining : orderedArticles;
+const startArticle = startHere.length === 1 ? startHere[0] : undefined;
 ---
 
 <BaseLayout
@@ -68,15 +89,59 @@ const countFor = (id: string) =>
     </div>
   </Container>
 
-  {startHere.length > 0 && (
+  {showStartHere && (
     <Container class="py-6 sm:py-8">
       <div class="rounded-2xl border border-rule bg-surface p-6 sm:p-8">
-        <p class="text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-highlight">Start here</p>
-        <div class="mt-5 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {startHere.map((article) => (
-            <ArticleCard article={article} series={series} />
-          ))}
-        </div>
+        <h2 class="text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-highlight">Start here</h2>
+
+        {startArticle ? (
+          <a
+            href={url(`/articles/${startArticle.id}/`)}
+            class="group mt-5 grid gap-6 sm:grid-cols-[14rem_1fr] sm:items-center"
+          >
+            <div class="overflow-hidden rounded-xl bg-accent-soft">
+              {startArticle.data.cover ? (
+                <Image
+                  src={startArticle.data.cover}
+                  alt={startArticle.data.coverAlt ?? ''}
+                  widths={[400, 700]}
+                  sizes="(min-width: 640px) 224px, 100vw"
+                  class="aspect-[4/3] w-full object-cover object-top"
+                  loading="eager"
+                />
+              ) : (
+                <div class="aspect-[4/3] bg-accent-soft" />
+              )}
+            </div>
+            <div>
+              <h3
+                class="text-xl font-semibold leading-snug tracking-tight text-ink transition-colors group-hover:text-accent sm:text-2xl"
+                lang={startArticle.data.language === 'kn' ? 'kn' : undefined}
+              >
+                {startArticle.data.title}
+              </h3>
+              <p
+                class="mt-2 line-clamp-3 text-sm leading-relaxed text-muted"
+                lang={startArticle.data.language === 'kn' ? 'kn' : undefined}
+              >
+                {startArticle.data.summary}
+              </p>
+              <p class="mt-3 text-xs text-muted">
+                <time datetime={startArticle.data.publishedAt.toISOString()}>
+                  {formatDate(startArticle.data.publishedAt)}
+                </time>
+                <span class="mx-1.5 text-rule">·</span>
+                {readingTime(startArticle)} min read
+              </p>
+            </div>
+          </a>
+        ) : (
+          <div class="mt-5 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {startHere.map((article) => (
+              <ArticleCard article={article} series={series} />
+            ))}
+          </div>
+        )}
       </div>
     </Container>
   )}
@@ -96,11 +161,11 @@ const countFor = (id: string) =>
 
   <Container class="py-8 sm:py-10">
     <h2 class="mb-5 border-b border-rule pb-3 text-xl font-semibold tracking-tight text-ink">
-      All articles
+      {showStartHere ? 'More in this series' : 'Articles'}
     </h2>
-    {articles.length > 0 ? (
+    {listingArticles.length > 0 ? (
       <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-        {articles.map((article) => (
+        {listingArticles.map((article) => (
           <ArticleCard
             article={article}
             series={article.data.series ? seriesMap.get(article.data.series.id) : undefined}

@@ -3,9 +3,15 @@ import Container from './Container.astro';
 import ThemeToggle from './ThemeToggle.astro';
 import { site } from '../data/site';
 import { url } from '../lib/url';
+
+const pathname = Astro.url.pathname;
+const isActive = (href: string): boolean => {
+  const target = url(href);
+  return target === '/' ? pathname === '/' : pathname.startsWith(target);
+};
 ---
 
-<header class="sticky top-0 z-40 border-b border-rule bg-paper/95 backdrop-blur">
+<header class="no-print sticky top-0 z-40 border-b border-rule bg-paper/95 backdrop-blur">
   <Container class="flex h-16 items-center justify-between gap-4">
     <a href={url('/')} class="flex min-w-0 items-center gap-3" aria-label={`${site.name} home`}>
       <span class="text-xl font-bold tracking-tight text-ink">CPUS</span>
@@ -18,8 +24,11 @@ import { url } from '../lib/url';
       {site.nav.map((item) => (
         <a
           href={url(item.href)}
-          class="transition-colors hover:text-accent"
-          aria-current={Astro.url.pathname === url(item.href) ? 'page' : undefined}
+          class:list={[
+            'transition-colors hover:text-accent',
+            isActive(item.href) && 'text-ink',
+          ]}
+          aria-current={isActive(item.href) ? 'page' : undefined}
         >
           {item.label}
         </a>
@@ -40,7 +49,11 @@ import { url } from '../lib/url';
             {site.nav.map((item) => (
               <a
                 href={url(item.href)}
-                class="rounded-lg px-3 py-2.5 text-sm font-medium text-ink hover:bg-accent-soft"
+                class:list={[
+                  'rounded-lg px-3 py-2.5 text-sm font-medium text-ink hover:bg-accent-soft',
+                  isActive(item.href) && 'bg-accent-soft',
+                ]}
+                aria-current={isActive(item.href) ? 'page' : undefined}
               >
                 {item.label}
               </a>

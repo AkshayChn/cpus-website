@@ -22,7 +22,7 @@ const visibleSeries = series.filter((entry) => !entry.data.parent);
       <p class="text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-highlight">The archive</p>
       <h1 class="mt-2 text-4xl font-semibold tracking-tight text-ink sm:text-5xl">Articles</h1>
       <p class="mt-4 text-lg leading-relaxed text-muted">
-        All articles from CPUS, newest first. {articles.length} articles.
+        Newest first. {articles.length} articles.
       </p>
     </header>
 
@@ -39,6 +39,10 @@ const visibleSeries = series.filter((entry) => !entry.data.parent);
   </Container>
 
   <Container class="pb-12">
+    <div class="mb-5 flex items-end justify-between gap-3 border-b border-rule pb-3">
+      <h2 class="text-xl font-semibold tracking-tight text-ink">All articles</h2>
+      <span class="text-sm text-muted">{articles.length} total</span>
+    </div>
     <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
       {articles.map((article) => (
         <ArticleCard
