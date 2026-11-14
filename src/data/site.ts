@@ -1,9 +1,8 @@
 export const site = {
   name: 'CPUS',
   fullName: 'Center for Public Understanding of Science',
-  tagline: 'Science, in the language we live in.',
-  description:
-    'The Center for Public Understanding of Science (CPUS) is an Indian initiative working to make science part of everyday public life.',
+  description: 'The Center for Public Understanding of Science (CPUS), Bengaluru.',
+  // Source: the Contact page in the WordPress export.
   email: 'channeshts@gmail.com',
   directorEmail: 'director@cfpus.org',
   phones: ['+91 94482 68548', '+91 91106 00283'],
@@ -31,11 +30,11 @@ export const site = {
     { label: 'Contact', href: '/contact/' },
     { label: 'Donate', href: '/donate/' },
   ],
+  // Source: links found on the current cfpus.org site and in the export.
   social: {
     youtube: 'https://www.youtube.com/channel/UCyCr7sqonr-wmvOrEgMau3g',
     facebook: 'https://www.facebook.com/CPUSBengaluru/',
     instagram: 'https://www.instagram.com/cpus_bengaluru/',
-    twitter: 'https://twitter.com/CPUS16',
   },
   donate: {
     // Source: the CPUS Donate page in the WordPress export.

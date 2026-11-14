@@ -4,16 +4,13 @@ import Container from '../components/Container.astro';
 import { site } from '../data/site';
 ---
 
-<BaseLayout title="Donate" description="Support the public understanding of science.">
+<BaseLayout title="Donate" description="Bank transfer details for CPUS.">
   <Container class="py-10 sm:py-14">
     <div class="mx-auto max-w-2xl">
       <header class="border-b border-rule pb-6">
         <p class="text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-highlight">Support</p>
         <h1 class="mt-2 text-4xl font-semibold tracking-tight text-ink sm:text-5xl">Donate</h1>
-        <p class="mt-4 text-lg leading-relaxed text-muted">
-          CPUS is a small, independent initiative. Contributions help us keep the writing free and
-          the archive open.
-        </p>
+        <p class="mt-4 text-lg leading-relaxed text-muted">Bank transfer details for CPUS.</p>
       </header>
 
       <div class="mt-8 rounded-2xl border border-rule bg-surface p-6 sm:p-8">
@@ -35,8 +32,8 @@ import { site } from '../data/site';
       </div>
 
       <p class="mt-6 text-sm leading-relaxed text-muted">
-        Please write to <a href={`mailto:${site.email}`} class="text-accent hover:underline">{site.email}</a>{' '}
-        after a transfer so we can acknowledge it.
+        For questions about donations, contact{' '}
+        <a href={`mailto:${site.email}`} class="text-accent hover:underline">{site.email}</a>.
       </p>
     </div>
   </Container>

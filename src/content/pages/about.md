@@ -1,25 +1,22 @@
 ---
 title: About CPUS
-description: The Center for Public Understanding of Science is an Indian initiative working to make science part of everyday public life.
+description: About the Center for Public Understanding of Science (CPUS).
 updatedAt: 2026-11-13
 ---
 
+The Center for Public Understanding of Science (CPUS) is based in Bengaluru. This page is being written with the CPUS team.
+
 ## Who we are
 
-The Center for Public Understanding of Science (CPUS) is an Indian initiative working to make science part of everyday public life. We write, translate, teach, and create spaces where scientific ideas can be discussed without gatekeeping.
-
-This page is an outline for now. The full history, people, and programme pages will be written with the CPUS team.
+Content to be added.
 
 ## Vision
 
-A public that can engage with science on its own terms — curious, critical, and unafraid to ask questions.
+Content to be added.
 
-## What we do
+## Work
 
-- Long-form science writing in Kannada
-- Series on plants, books, scientists, and the Nobel Prizes
-- Talks, workshops, and public conversations
-- Resources for teachers, students, and general readers
+Content to be added.
 
 ## People
 

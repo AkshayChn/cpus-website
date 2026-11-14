@@ -44,11 +44,6 @@ const imageUrl = image ? new URL(url(image), Astro.site) : undefined;
     <meta property="og:url" content={canonical} />
     {imageUrl && <meta property="og:image" content={imageUrl} />}
 
-    <meta name="twitter:card" content={imageUrl ? 'summary_large_image' : 'summary'} />
-    <meta name="twitter:title" content={pageTitle} />
-    <meta name="twitter:description" content={description} />
-    {imageUrl && <meta name="twitter:image" content={imageUrl} />}
-
     <link rel="icon" href={url('/favicon.svg')} type="image/svg+xml" />
 
     <script is:inline>
