@@ -43,9 +43,9 @@ const countForSeries = (id: string): number => {
 <BaseLayout description="The Center for Public Understanding of Science (CPUS), Bengaluru.">
   <ConstructionBanner slot="banner" />
 
-  <Container class="py-10 sm:py-14">
+  <Container class="py-6 sm:py-10 lg:py-14">
     {lead && (
-      <section class="grid items-center gap-8 lg:grid-cols-[1.15fr_1fr] lg:gap-12">
+      <section class="grid items-center gap-5 sm:gap-8 lg:grid-cols-[1.15fr_1fr] lg:gap-12">
         <a href={url(`/articles/${lead.id}/`)} class="group block overflow-hidden rounded-2xl bg-accent-soft">
           {lead.data.cover ? (
             <Image
@@ -54,7 +54,7 @@ const countForSeries = (id: string): number => {
               widths={[700, 1100, 1500]}
               sizes="(min-width: 1024px) 700px, 100vw"
               class:list={[
-                'aspect-[4/3] w-full object-cover transition-transform duration-700 group-hover:scale-[1.02]',
+                'aspect-[16/9] w-full object-cover transition-transform duration-700 group-hover:scale-[1.02] sm:aspect-[4/3]',
                 leadIsPortrait && 'object-top',
               ]}
               loading="eager"
@@ -78,20 +78,20 @@ const countForSeries = (id: string): number => {
           </div>
 
           <h1
-            class="mt-4 text-4xl font-semibold leading-[1.15] tracking-tight text-ink sm:text-5xl"
+            class="mt-3 text-3xl font-semibold leading-[1.15] tracking-tight text-ink sm:mt-4 sm:text-5xl"
             lang={lead.data.language === 'kn' ? 'kn' : undefined}
           >
             <a href={url(`/articles/${lead.id}/`)} class="hover:text-accent">{lead.data.title}</a>
           </h1>
 
           <p
-            class="mt-4 text-lg leading-relaxed text-muted"
+            class="mt-3 text-base leading-relaxed text-muted sm:mt-4 sm:text-lg"
             lang={lead.data.language === 'kn' ? 'kn' : undefined}
           >
             {lead.data.summary}
           </p>
 
-          <div class="mt-6 flex flex-wrap items-center gap-4 text-sm text-muted">
+          <div class="mt-4 flex flex-wrap items-center gap-4 text-sm text-muted sm:mt-6">
             <span>{readingTime(lead)} min read</span>
             {lead.data.language === 'kn' && <span lang="kn">ಕನ್ನಡ</span>}
             <a
