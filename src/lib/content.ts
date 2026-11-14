@@ -12,6 +12,13 @@ function byNewest(a: Article, b: Article): number {
   return b.data.publishedAt.getTime() - a.data.publishedAt.getTime();
 }
 
+function bySeriesOrder(a: Article, b: Article): number {
+  const aOrder = a.data.seriesOrder ?? Number.MAX_SAFE_INTEGER;
+  const bOrder = b.data.seriesOrder ?? Number.MAX_SAFE_INTEGER;
+
+  return aOrder - bOrder || a.data.publishedAt.getTime() - b.data.publishedAt.getTime();
+}
+
 export async function getArticles(): Promise<Article[]> {
   const entries = await getCollection('articles', isPublished);
   return entries.sort(byNewest);
@@ -51,7 +58,9 @@ export async function getSeriesChildren(parent: string): Promise<Series[]> {
 
 export async function getArticlesBySeries(series: string, limit?: number): Promise<Article[]> {
   const articles = await getArticles();
-  const filtered = articles.filter((entry) => entry.data.series?.id === series);
+  const filtered = articles
+    .filter((entry) => entry.data.series?.id === series)
+    .sort(bySeriesOrder);
   return typeof limit === 'number' ? filtered.slice(0, limit) : filtered;
 }
 
@@ -84,9 +93,15 @@ export async function getRelatedArticles(article: Article, limit = 3): Promise<A
 
 export function readingTime(article: Article): number {
   const body = article.body ?? '';
-  const text = body.replace(/<[^>]+>/g, ' ').replace(/[#*_>`~[\]()]/g, ' ');
+  const text = body
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/[#*_>`~]/g, ' ');
   const words = text.trim().split(/\s+/).filter(Boolean).length;
-  return Math.max(1, Math.round(words / 180));
+  const wordsPerMinute = article.data.language === 'kn' ? 150 : 220;
+
+  return Math.max(1, Math.round(words / wordsPerMinute));
 }
 
 export function formatDate(date: Date): string {

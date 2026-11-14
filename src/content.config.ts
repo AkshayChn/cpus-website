@@ -16,6 +16,7 @@ const articles = defineCollection({
       publishedAt: z.coerce.date(),
       updatedAt: z.coerce.date().optional(),
       series: reference('series').optional(),
+      seriesOrder: z.number().optional(),
       language: z.enum(['kn', 'en']).default('kn'),
       author: z.string().default('CPUS'),
       cover: image().optional(),
