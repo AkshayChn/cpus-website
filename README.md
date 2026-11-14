@@ -19,6 +19,8 @@ bun run dev
 
 Local site: `http://localhost:4321/`
 
+Production: `https://channesh.org/`
+
 ## Build
 
 ```bash
@@ -26,8 +28,8 @@ bun run build
 bun run preview
 ```
 
-The GitHub Pages preview is served from `/cpus-website/`. The deploy workflow
-sets `BASE_PATH=/cpus-website`; local development uses `/`.
+The site is served at `https://channesh.org/` from the domain root. The deploy
+workflow builds with the default base path (`/`).
 
 ## Content
 
