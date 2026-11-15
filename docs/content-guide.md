@@ -31,9 +31,11 @@ separate server. Sign in with a **fine-grained personal access token**:
 
 The CMS opens **Articles**, **Series**, and **Pages**. Choose an entry, edit it,
 and select **Save**. With the current simple workflow, a save commits directly to
-`main`; the Pages workflow then builds and deploys the site. To keep work out of
-the live site, set `draft: true` and save; drafts are visible in local dev but
-excluded from production builds.
+the configured branch. While the `sveltia-cms` integration branch is under
+review, that is `sveltia-cms`, so test saves do not touch the live site. After
+merge it is `main`, and the Pages workflow builds and deploys the site. To keep
+work out of the live site, set `draft: true` and save; drafts are visible in local
+dev but excluded from production builds.
 
 New entries need a slug. The CMS requires lowercase ASCII letters, numbers, and
 hyphens. For a Kannada title, type a descriptive English or transliterated slug

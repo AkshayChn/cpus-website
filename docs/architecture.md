@@ -331,10 +331,16 @@ server.
 - The CMS is deliberately not allowed to edit `src/data/site.ts`, navigation,
   styles, or code. Those remain code-reviewed.
 
-The current workflow is **simple**: a save commits directly to `main`, and the
-Pages workflow deploys it. If `main` later requires pull requests, switch
-`publish_mode` to the editorial workflow; each editor's token then needs
-**Pull requests: read and write** in addition to **Contents: read and write**.
+The current workflow is **simple**: a save commits directly to the configured
+branch. On the `sveltia-cms` integration branch that is `sveltia-cms`, so test
+saves do not deploy; after merge it is `main`, and the Pages workflow deploys
+each save. If `main` later requires pull requests, switch `publish_mode` to the
+editorial workflow; each editor's token then needs **Pull requests: read and
+write** in addition to **Contents: read and write**.
+
+The `Check` workflow fails a pull request targeting `main` while
+`backend.branch` is not `main`. Change it back to `main` before merging the
+integration branch.
 
 ### Token constraint
 

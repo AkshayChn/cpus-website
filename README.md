@@ -185,7 +185,10 @@ Tags are manual, lowercase, and URL-safe. Do not infer them from article text.
 5. Upload `dist/` as the GitHub Pages artifact and deploy it.
 
 `.github/workflows/check.yml` runs `bun install --frozen-lockfile`,
-`bun run check`, and `bun run build` on pull requests. It does not deploy.
+`bun run check`, and `bun run build` on pull requests. It does not deploy. It
+also fails a pull request targeting `main` while the CMS
+`backend.branch` is still `sveltia-cms`, so change that to `main` before merging
+the integration branch.
 
 The custom domain is `channesh.org`, stored in `public/CNAME`. Pages is served
 from the domain root, so the default base path is `/`. `BASE_PATH` remains as an

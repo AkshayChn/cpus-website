@@ -12,7 +12,9 @@
 backend:
   name: github
   repo: AkshayChn/cpus-website
-  branch: main
+  # Integration branch. Change this to main before merging to main; the Check
+  # workflow fails a pull request targeting main while this is not main.
+  branch: sveltia-cms
   auth_methods: [token]
   commit_messages:
     create: 'content: add {{collection}} "{{slug}}"'

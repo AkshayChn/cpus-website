@@ -18,6 +18,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Verify CMS branch
+        if: github.base_ref == 'main'
+        run: |
+          if ! grep -qE '^  branch: main$' public/admin/config.yml; then
+            echo "::error file=public/admin/config.yml::Set backend.branch to main before merging."
+            exit 1
+          fi
+
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
