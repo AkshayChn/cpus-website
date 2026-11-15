@@ -53,13 +53,13 @@
 
 [data-theme='dark'] {
   color-scheme: dark;
-  --paper: #22251f;
-  --surface: #2a2e26;
+  --paper: #24211d;
+  --surface: #2d2924;
   --ink: #f3efe6;
   --muted: #c0b9ad;
-  --rule: #464c40;
+  --rule: #4b453e;
   --accent: #9bd9bd;
-  --accent-soft: #2d3d33;
+  --accent-soft: #30352f;
   --highlight: #e8a078;
   --highlight-soft: #443027;
 }
