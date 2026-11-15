@@ -87,7 +87,8 @@ TypeScript modules.
    generates responsive widths, converts to WebP, and writes hashed files under
    `dist/_astro/`. The HTML gets a `srcset` and `sizes` attribute.
 7. **Emit static output.** Every route becomes
-   `dist/<route>/index.html`. CSS and the small client bundles are emitted with
+   `dist/<route>/index.html`. CSS is emitted with a hashed name. Small client
+   scripts are inlined as module scripts; larger ones would be emitted with
    hashed names. Files in `public/` are copied verbatim.
 8. **Deploy.** The GitHub Actions workflow uploads `dist/` as a Pages artifact.
    GitHub Pages serves it as static files.
@@ -103,7 +104,7 @@ There are two execution environments to keep separate:
 | Environment | When it runs | What runs there |
 | --- | --- | --- |
 | Node (build time) | Once per `bun run build` or dev request | Astro frontmatter, `getCollection`, `render`, TypeScript helpers |
-| Browser (request time) | When a visitor loads a page | HTML, CSS, and the explicit `<script>` bundles |
+| Browser (request time) | When a visitor loads a page | HTML, CSS, and the explicit client scripts |
 
 Consequences:
 
@@ -116,10 +117,11 @@ Consequences:
 - `class:list` is an Astro helper that flattens conditional class names at build
   time.
 - A `<script>` block in an `.astro` file is processed by Astro/Vite, bundled, and
-  served to the browser. Add `is:inline` to leave a script untouched and inline
-  it in the HTML. The only intentional inline script is the theme/bootstrap
-  snippet in `src/layouts/BaseLayout.astro`, which must run before first paint
-  to avoid a flash of the wrong theme.
+  either inlined into the page (as in this build) or emitted as a hashed module.
+  Either way it runs in the browser. Add `is:inline` to leave a script untouched
+  and inline it in the HTML. The only intentional raw inline script in source is
+  the theme/bootstrap snippet in `src/layouts/BaseLayout.astro`, which must run
+  before first paint to avoid a flash of the wrong theme.
 
 ## 5. Routing
 
