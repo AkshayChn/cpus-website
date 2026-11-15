@@ -11,7 +11,10 @@ reads Markdown files and `.astro` components, validates the content, renders
 every route to HTML, optimises images, and writes a directory of plain files to
 `dist/`. GitHub Pages serves that directory over HTTPS. There is no application
 server at request time, no database, and no API. "Rendering" here means
-rendering during the build, not per visitor.
+rendering during the build, not per visitor. Content editing is handled by
+Sveltia CMS, a static admin page in `public/admin/` that talks directly to the
+GitHub API from the browser. It is not part of the Astro build and has no
+server-side component.
 
 ## 2. What Astro is
 
@@ -89,7 +92,8 @@ TypeScript modules.
 7. **Emit static output.** Every route becomes
    `dist/<route>/index.html`. CSS is emitted with a hashed name. Small client
    scripts are inlined as module scripts; larger ones would be emitted with
-   hashed names. Files in `public/` are copied verbatim.
+   hashed names. Files in `public/` are copied verbatim, including the static
+   admin page and its vendored Sveltia runtime.
 8. **Deploy.** The GitHub Actions workflow uploads `dist/` as a Pages artifact.
    GitHub Pages serves it as static files.
 
@@ -174,6 +178,9 @@ coerces dates, defaults `language` to `kn`, defaults `tags` to an empty array,
 and checks that `series` and `parent` point at real series entries. The
 `image()` helper validates image paths and returns metadata (width, height,
 format) that the templates use to choose the cover treatment.
+
+The CMS configuration in `public/admin/config.yml` mirrors this schema. When a
+field is added, renamed, or made optional, change both files in the same commit.
 
 `src/lib/content.ts` is the query layer. It hides collection access and sorting:
 
@@ -282,7 +289,8 @@ Two kinds of assets exist:
   referenced relatively in frontmatter or Markdown. `image()` validates them and
   `<Image>` optimises them. They are content, not public files.
 - **Public files** live in `public/` and are copied verbatim to `dist/`. This is
-  reserved for `CNAME`, `favicon.svg`, and `robots.txt`.
+  reserved for `CNAME`, `favicon.svg`, `robots.txt`, and the static admin page
+  under `public/admin/`.
 
 Astro generates responsive variants and hashes filenames, so images can be
 cached forever. The lead image is eager; below-the-fold images are lazy. Width
@@ -291,7 +299,78 @@ and height metadata prevents layout shift.
 Do not put article images in `public/`. That bypasses validation, resizing, and
 cache-busting.
 
-## 10. Deployment
+## 10. Content editor (Sveltia CMS)
+
+The editor is at `https://channesh.org/admin/`. It is a static page, not an
+Astro route:
+
+```text
+public/admin/
+├── index.html          # loads the vendored Sveltia runtime
+├── config.yml          # backend, collections, fields, media rules
+└── vendor/
+    ├── sveltia-cms.js  # pinned third-party runtime, 0.266.0
+    └── LICENSE.txt
+```
+
+Sveltia is a **client-side Git client**, not a CMS server. It runs in the
+editor's browser, authenticates to the GitHub API with a fine-grained personal
+access token, reads the configured repository, and commits Markdown and images
+back to it. The token is stored in the browser's `localStorage` on the
+`channesh.org` origin. Nothing is sent to a CPUS server because there is no CPUS
+server.
+
+`config.yml` mirrors `src/content.config.ts`:
+
+- Articles and series use page bundles (`path: '{{slug}}/index'`, entry-relative
+  `media_folder` and `public_folder`) so images stay beside `index.md`.
+- Pages are flat files; the CMS allows editing but not creating or deleting
+  them.
+- `output.omit_empty_optional_fields: true` keeps empty optional fields out of
+  the frontmatter, matching the Zod `.optional()` schemas.
+- The CMS is deliberately not allowed to edit `src/data/site.ts`, navigation,
+  styles, or code. Those remain code-reviewed.
+
+The current workflow is **simple**: a save commits directly to `main`, and the
+Pages workflow deploys it. If `main` later requires pull requests, switch
+`publish_mode` to the editorial workflow; each editor's token then needs
+**Pull requests: read and write** in addition to **Contents: read and write**.
+
+### Token constraint
+
+Fine-grained PATs cannot write to a repository where the user is an **outside or
+repository collaborator**. The repository is currently owned by a personal
+account, so other editors cannot use fine-grained PATs against it. Before
+onboarding editors, move the repository to a free GitHub organization and add
+them as **organization members** with write access. A free organization costs
+nothing for public repositories.
+
+### Security notes
+
+- The admin page is `noindex` and is not linked from the public site.
+- The public site has no third-party scripts, which keeps the same-origin token
+  surface small. Do not add analytics or embeds without revisiting this.
+- The Sveltia runtime is vendored and pinned in `public/admin/vendor/`, not
+  loaded from a CDN. The bundle still loads pinned locale, font, and optional
+  feature chunks from jsDelivr and UNPKG; those requests do not contain the
+  token.
+- GitHub Pages cannot set custom response headers, so there is no CSP header.
+- A fine-grained PAT is repository-wide write access within its permissions.
+  `root_dir` and the CMS UI are not a security boundary; GitHub repository
+  permissions and branch protection are.
+- Never commit a token. Do not put one in `config.yml`, `work/`, a screenshot,
+  or chat.
+
+### Local testing
+
+Run `bun run dev` and open
+`http://localhost:4321/admin/index.html`. In Chrome or Edge, choose **Work with
+Local Repository** and select the repository root; saves write to local files and
+do not need a token. Firefox can sign in with a token but does not support the
+local repository API. Use `bun run check` and `bun run build` after changing the
+CMS config.
+
+## 11. Deployment
 
 The workflow is `.github/workflows/deploy.yml`:
 
@@ -302,6 +381,9 @@ The workflow is `.github/workflows/deploy.yml`:
 5. `bun run build`.
 6. Upload `dist` with `actions/upload-pages-artifact`.
 7. Deploy with `actions/deploy-pages`.
+
+`.github/workflows/check.yml` runs `bun install --frozen-lockfile`,
+`bun run check`, and `bun run build` on pull requests. It does not deploy.
 
 The Pages source must be set to **GitHub Actions** in the repository settings.
 The custom domain is `channesh.org` (`public/CNAME`). The workflow uses the
@@ -318,7 +400,7 @@ The site is intentionally `noindex`:
 `BaseLayout.astro` emits `noindex, nofollow, noarchive, nosnippet`, and
 `public/robots.txt` disallows all crawlers. Both must be removed at launch.
 
-## 11. Where to change what
+## 12. Where to change what
 
 | Task | Files |
 | --- | --- |
@@ -332,9 +414,13 @@ The site is intentionally `noindex`:
 | Change content queries or sorting | `src/lib/content.ts` |
 | Change URL handling | `src/lib/url.ts` |
 | Change Markdown rendering | `astro.config.ts`, `src/lib/rehype-figure.ts` |
+| Edit content through the CMS | `https://channesh.org/admin/`; files under `src/content/` |
+| Change CMS collections or fields | `public/admin/config.yml` and `src/content.config.ts` together |
+| Change the CMS shell or runtime | `public/admin/index.html`, `public/admin/vendor/` |
+| Change pull-request checks | `.github/workflows/check.yml` |
 | Change build or deployment | `astro.config.ts`, `.github/workflows/deploy.yml` |
 
-## 12. Glossary
+## 13. Glossary
 
 | Term | Meaning here |
 | --- | --- |
@@ -350,5 +436,9 @@ The site is intentionally `noindex`:
 | **Vite** | The bundler/dev server Astro uses under the hood. |
 | **Hydration** | Making server-rendered HTML interactive in the browser. This site does not hydrate components. |
 | **Island** | An explicitly interactive component embedded in an otherwise static page. Not used here. |
+| **Sveltia CMS** | Static, browser-based Git editor at `/admin/`. It commits Markdown and images to GitHub through the API. |
+| **Personal access token (PAT)** | A GitHub credential stored in the editor's browser and used by Sveltia. It is never committed. |
+| **Page bundle** | An entry stored as `<slug>/index.md` with its images in the same folder. |
+| **Simple workflow** | Sveltia saves directly to the configured branch. The alternative is the editorial workflow, which uses branches and pull requests. |
 | **Base path** | The URL prefix the site is built under; `/` for the custom domain. |
 | **Artifact** | The built `dist/` directory uploaded to GitHub Pages. |

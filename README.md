@@ -5,8 +5,9 @@ Bengaluru: <https://channesh.org/>.
 
 This is a greenfield, static replacement for the old WordPress site at
 <https://cfpus.org/>. Articles are written in Markdown, validated at build time,
-and compiled to plain HTML, CSS, and optimised images. There is no server,
-database, CMS, or client-side application.
+and compiled to plain HTML, CSS, and optimised images. There is no application
+server or database. Content can be edited through Sveltia CMS, a static admin
+page that commits Markdown and images directly to GitHub.
 
 > **Preview status.** The site is intentionally `noindex`, and
 > `public/robots.txt` disallows crawling. Remove both only when the site is
@@ -18,6 +19,8 @@ database, CMS, or client-side application.
 - Astro 7 static output, TypeScript, Tailwind CSS 4
 - Bun 1.4.4 for install and scripts; Node 24 for Astro's build
 - GitHub Actions builds and deploys to GitHub Pages on every push to `main`
+- Sveltia CMS at `/admin/`: static, token-only, and commits content to Git; no
+  CMS server or database
 - No client-side framework; JavaScript is limited to the theme switch, the
   construction banner, and reading-page enhancements
 
@@ -30,7 +33,8 @@ database, CMS, or client-side application.
 | [Tailwind CSS](https://tailwindcss.com/) 4 | Utility CSS through the Vite plugin, plus design tokens in `src/styles/global.css`. |
 | [Bun](https://bun.sh/) 1.4.4 | Package manager, lockfile, and script runner. |
 | Node 24 | Astro's build runtime. Astro 7 requires Node >= 22.23.4. |
-| GitHub Actions + Pages | Build and deploy on every push to `main`. |
+| GitHub Actions + Pages | Build and deploy on every push to `main`; check pull requests. |
+| [Sveltia CMS](https://sveltiacms.app/) 0.266.0 | Static admin page in `public/admin/`. Edits Markdown and images through the GitHub API; no server or database. |
 
 There is deliberately no React, Vue, Svelte, daisyUI, or other component
 framework. See `docs/architecture.md` for the reasoning and the build model.
@@ -44,7 +48,10 @@ bun install
 bun run dev
 ```
 
-The dev server prints its URL, normally <http://localhost:4321/>.
+The dev server prints its URL, normally <http://localhost:4321/>. The content
+editor is at <http://localhost:4321/admin/index.html>. In Chrome or Edge, use
+**Work with Local Repository** to edit local files without a token. Firefox can
+sign in with a token but cannot use the local repository workflow.
 
 | Command | Purpose |
 | --- | --- |
@@ -97,9 +104,9 @@ The full walkthrough is in `docs/architecture.md`. Authoring rules are in
 │   ├── data/site.ts         # Nav, footer, contact, social, donation details
 │   ├── scripts/             # Small client-side TypeScript modules
 │   └── styles/global.css    # Tailwind import, design tokens, prose, dark mode
-├── public/                  # Copied verbatim: CNAME, favicon, robots.txt
+├── public/                  # Copied verbatim: CNAME, favicon, robots.txt, admin/
 ├── docs/                    # Architecture and content guide
-├── .github/workflows/       # GitHub Pages deployment
+├── .github/workflows/       # Pull-request checks and GitHub Pages deployment
 ├── work/                    # Local notes and WordPress export (gitignored)
 └── dist/                    # Build output (gitignored)
 ```
@@ -119,6 +126,7 @@ The full walkthrough is in `docs/architecture.md`. Authoring rules are in
 | `/resources/` | `src/pages/resources.astro` | Publications and links |
 | `/contact/` | `src/pages/contact.astro` | Contact details |
 | `/donate/` | `src/pages/donate.astro` | Donation details |
+| `/admin/` | `public/admin/index.html` | Sveltia CMS (noindex, not linked) |
 | `/404.html` | `src/pages/404.astro` | Not found |
 
 URLs always use a trailing slash. The build writes
@@ -133,6 +141,10 @@ Content lives in `src/content/`:
   Markdown file and are referenced relatively.
 - `series/<slug>/index.md` — series metadata and a short description.
 - `pages/*.md` — prose pages such as About and Resources.
+
+Editors can use the CMS at `/admin/` instead of editing these files directly.
+The CMS writes the same Markdown and image layout described below. See
+`docs/content-guide.md` for the editor workflow and token requirements.
 
 A minimal article looks like this:
 
@@ -172,6 +184,9 @@ Tags are manual, lowercase, and URL-safe. Do not infer them from article text.
 4. `bun run build`
 5. Upload `dist/` as the GitHub Pages artifact and deploy it.
 
+`.github/workflows/check.yml` runs `bun install --frozen-lockfile`,
+`bun run check`, and `bun run build` on pull requests. It does not deploy.
+
 The custom domain is `channesh.org`, stored in `public/CNAME`. Pages is served
 from the domain root, so the default base path is `/`. `BASE_PATH` remains as an
 override for project-site previews but is not set in CI.
@@ -187,8 +202,8 @@ refresh before assuming the build failed.
 | File | Audience | Contents |
 | --- | --- | --- |
 | `README.md` | Everyone | Overview, setup, commands, map, deployment |
-| `docs/architecture.md` | Developers | What Astro is, build lifecycle, routing, styling, client JS |
-| `docs/content-guide.md` | Editors and authors | Adding articles, frontmatter, images, series, tags |
+| `docs/architecture.md` | Developers | Astro build lifecycle, routing, styling, client JS, CMS architecture |
+| `docs/content-guide.md` | Editors and authors | CMS workflow, articles, frontmatter, images, series, tags |
 | `AGENTS.md` | Local coding agents | Working rules and conventions (gitignored) |
 | `work/` | Local only | Session notes, retro, WordPress export (gitignored) |
 
@@ -204,7 +219,14 @@ refresh before assuming the build failed.
 - Kannada uses Noto Serif Kannada, generous line-height, left-aligned text, and
   no italics for emphasis. English UI uses the system sans stack. Latin words
   inside Kannada prose use the serif fallback.
-- All authored code is TypeScript. No `.js` or `.mjs` source files.
+- All authored code is TypeScript. No `.js` or `.mjs` source files. The vendored
+  Sveltia runtime in `public/admin/vendor/` is a third-party asset, not authored
+  project code.
+- The CMS config (`public/admin/config.yml`) mirrors
+  `src/content.config.ts`. Change both in the same commit when the content model
+  changes.
+- Never commit a personal access token. Editors keep their token in their own
+  browser; the repository contains no credentials.
 - No client-side framework and no component library.
 - The only raw inline script is the theme/banner bootstrap in
   `src/layouts/BaseLayout.astro`, which prevents a theme flash before paint.
@@ -221,3 +243,6 @@ refresh before assuming the build failed.
 | A tag page is missing | Tags are generated from published articles; add the tag to at least one article. |
 | The site looks old after a deploy | GitHub Pages caches HTML; hard refresh. |
 | Fonts look wrong | Kannada uses the Noto Serif Kannada subset; Latin prose uses the Georgia fallback, not a webfont. |
+| CMS sign-in fails with a fine-grained token | The repository is owned by a personal account and you are an outside collaborator | Move the repository to a GitHub organization and join it as a member. |
+| CMS save fails with “Resource not accessible by personal access token” | The token lacks Contents write (or Pull requests write for the editorial workflow) | Edit or recreate the token with the required permissions. |
+| A CMS image is missing after save | The upload went to the wrong folder or the Markdown path is wrong | Keep article and series images beside `index.md` and reference them relatively. |

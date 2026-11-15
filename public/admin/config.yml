@@ -1,0 +1,293 @@
+# yaml-language-server: $schema=https://unpkg.com/@sveltia/cms/schema/sveltia-cms.json
+#
+# Sveltia CMS configuration for the CPUS site.
+#
+# The admin page is a static file: public/admin/index.html.
+# Authentication is token-only. There is no OAuth client, auth server, database,
+# or application server.
+#
+# Field names and types mirror src/content.config.ts. Change both files in the
+# same commit when the content model changes.
+
+backend:
+  name: github
+  repo: AkshayChn/cpus-website
+  branch: main
+  auth_methods: [token]
+  commit_messages:
+    create: 'content: add {{collection}} "{{slug}}"'
+    update: 'content: update {{collection}} "{{slug}}"'
+    delete: 'content: delete {{collection}} "{{slug}}"'
+    uploadMedia: 'media: upload "{{path}}"'
+    deleteMedia: 'media: delete "{{path}}"'
+
+site_url: https://channesh.org
+logo_url: https://channesh.org/favicon.svg
+
+# Direct commits to the configured branch. The editorial workflow (branches and
+# pull requests) is a later decision; it would need Pull requests read/write on
+# each editor's token.
+publish_mode: simple
+
+# Media defaults. Articles and series override these with entry-relative
+# folders, so their images stay beside index.md. Flat pages use these defaults.
+media_folder: public/uploads
+public_folder: /uploads
+
+# Sveltia writes an empty value for an optional field left empty. The Astro
+# schemas use .optional(), which accepts a missing property, not an empty one.
+output:
+  omit_empty_optional_fields: true
+
+# New slugs and media filenames are ASCII. Kannada titles therefore need a
+# manually typed slug, which the collection-level slug pattern enforces.
+slug:
+  encoding: ascii
+  clean_accents: true
+  sanitize_replacement: '-'
+
+media_libraries:
+  default:
+    config:
+      # 10 MiB. Large media should be optimised before upload; the GitHub
+      # backend does not support Git LFS.
+      max_file_size: 10485760
+      slugify_filename: true
+
+collections:
+  - name: articles
+    label: Articles
+    label_singular: Article
+    folder: src/content/articles
+    path: '{{slug}}/index'
+    media_folder: ''
+    public_folder: ''
+    extension: md
+    format: yaml-frontmatter
+    create: true
+    delete: false
+    identifier_field: title
+    thumbnail: cover
+    preview_path: '/articles/{{slug}}/'
+    preview_path_date_field: publishedAt
+    aliases_field: false
+    sortable_fields: [publishedAt, updatedAt, title]
+    slug:
+      editable: [create]
+      hint: 'Lowercase ASCII letters, numbers, and hyphens. This becomes the URL and cannot be changed later.'
+      pattern: ['^[a-z0-9]+(?:-[a-z0-9]+)*$', 'Use lowercase letters, numbers, and hyphens only']
+    fields:
+      - name: title
+        label: Title
+        widget: string
+        hint: 'The article title as it should appear on the page.'
+      - name: summary
+        label: Summary
+        widget: text
+        hint: 'The standfirst. Derive it from the article text, not from assumption.'
+      - name: publishedAt
+        label: Published at
+        widget: datetime
+        type: date
+        input_timezone: utc
+        default: '{{now}}'
+        hint: 'Used for sorting and display.'
+      - name: updatedAt
+        label: Updated at
+        widget: datetime
+        type: date
+        input_timezone: utc
+        required: false
+        hint: 'Optional. Shows an Updated date on the article page.'
+      - name: series
+        label: Series
+        widget: relation
+        collection: series
+        display_fields: [title]
+        search_fields: [title, titleKn]
+        required: false
+        hint: 'Optional. The series must already exist.'
+      - name: seriesOrder
+        label: Series order
+        widget: number
+        value_type: int
+        min: 1
+        required: false
+        hint: 'Reading order within the series. Lower comes first.'
+      - name: language
+        label: Language
+        widget: select
+        options:
+          - { label: Kannada, value: kn }
+          - { label: English, value: en }
+        default: kn
+        hint: 'Controls typography and reading speed.'
+      - name: author
+        label: Author
+        widget: string
+        default: CPUS
+        hint: 'Defaults to CPUS.'
+      - name: tags
+        label: Tags
+        widget: list
+        required: false
+        hint: 'Manual, lowercase, URL-safe. Reuse existing tags where possible.'
+        field:
+          name: tag
+          label: Tag
+          widget: string
+          pattern: ['^[a-z0-9]+(?:-[a-z0-9]+)*$', 'Use lowercase letters, numbers, and hyphens only']
+      - name: cover
+        label: Cover image
+        widget: image
+        required: false
+        accept: 'image/*'
+        hint: 'Stored beside index.md. Prefer a landscape image for hero covers.'
+      - name: coverAlt
+        label: Cover alt text
+        widget: string
+        required: false
+        hint: 'Describe the image, not the article. Required in practice for accessibility.'
+      - name: coverStyle
+        label: Cover style
+        widget: select
+        options: [hero, plate]
+        required: false
+        hint: 'Leave empty to choose automatically from the image aspect ratio.'
+      - name: featured
+        label: Featured
+        widget: boolean
+        default: false
+        hint: 'Featured articles can lead the homepage.'
+      - name: draft
+        label: Draft
+        widget: boolean
+        default: false
+        hint: 'Drafts are hidden from production builds.'
+      - name: body
+        label: Body
+        widget: markdown
+        modes: [raw, rich_text]
+        hint: 'Raw Markdown opens first so existing formatting is preserved. Review the diff after the first save. For a captioned image, use ![alt](fig-01.jpg "Caption") in raw mode.'
+
+  - name: series
+    label: Series
+    label_singular: Series
+    folder: src/content/series
+    path: '{{slug}}/index'
+    media_folder: ''
+    public_folder: ''
+    extension: md
+    format: yaml-frontmatter
+    create: true
+    delete: false
+    identifier_field: title
+    thumbnail: cover
+    preview_path: '/series/{{slug}}/'
+    aliases_field: false
+    sortable_fields: [order, title]
+    slug:
+      editable: [create]
+      hint: 'Lowercase ASCII letters, numbers, and hyphens. This becomes the URL and cannot be changed later.'
+      pattern: ['^[a-z0-9]+(?:-[a-z0-9]+)*$', 'Use lowercase letters, numbers, and hyphens only']
+    fields:
+      - name: title
+        label: Title
+        widget: string
+        hint: 'The English title.'
+      - name: titleKn
+        label: Kannada title
+        widget: string
+        required: false
+        hint: 'Optional Kannada title, shown on the series page.'
+      - name: description
+        label: Description
+        widget: text
+        hint: 'Short description for cards and the series header.'
+      - name: cover
+        label: Cover image
+        widget: image
+        required: false
+        accept: 'image/*'
+        hint: 'Stored beside index.md.'
+      - name: order
+        label: Order
+        widget: number
+        value_type: int
+        default: 0
+        hint: 'Lower numbers appear first on /series/.'
+      - name: featured
+        label: Featured
+        widget: boolean
+        default: false
+        hint: 'Shows the series on the homepage.'
+      - name: parent
+        label: Parent series
+        widget: relation
+        collection: series
+        display_fields: [title]
+        search_fields: [title, titleKn]
+        required: false
+        hint: 'Optional. Makes this a child series, such as a yearly Nobel edition.'
+      - name: startHere
+        label: Start here
+        widget: relation
+        collection: articles
+        display_fields: [title]
+        search_fields: [title]
+        multiple: true
+        required: false
+        hint: 'Manually curated article slugs for the Start here block.'
+      - name: draft
+        label: Draft
+        widget: boolean
+        default: false
+        hint: 'Drafts are hidden from production builds.'
+      - name: body
+        label: Body
+        widget: markdown
+        modes: [raw, rich_text]
+        required: false
+        hint: 'Optional short introduction for the series page.'
+
+  - name: pages
+    label: Pages
+    label_singular: Page
+    folder: src/content/pages
+    extension: md
+    format: yaml-frontmatter
+    create: false
+    delete: false
+    identifier_field: title
+    preview_path: '/{{slug}}/'
+    aliases_field: false
+    sortable_fields: [title, updatedAt]
+    slug:
+      editable: false
+    fields:
+      - name: title
+        label: Title
+        widget: string
+        hint: 'Page heading and title tag.'
+      - name: description
+        label: Description
+        widget: text
+        required: false
+        hint: 'Meta description and page standfirst.'
+      - name: updatedAt
+        label: Updated at
+        widget: datetime
+        type: date
+        input_timezone: utc
+        required: false
+        hint: 'Optional update date.'
+      - name: draft
+        label: Draft
+        widget: boolean
+        default: false
+        hint: 'Drafts are hidden from production builds.'
+      - name: body
+        label: Body
+        widget: markdown
+        modes: [raw, rich_text]
+        hint: 'Raw Markdown opens first so existing formatting is preserved.'

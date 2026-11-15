@@ -1,0 +1,4 @@
+# Vendored third-party runtime. Keep it out of language statistics and collapse
+# its diff so content changes remain readable.
+public/admin/vendor/** linguist-vendored
+public/admin/vendor/sveltia-cms.js -diff

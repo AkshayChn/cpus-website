@@ -4,6 +4,54 @@ This guide is for adding and editing content. The content is plain Markdown plus
 a small YAML frontmatter block. The build validates the block, so most mistakes
 are caught before anything is deployed.
 
+## Edit with Sveltia CMS
+
+The editor is at <https://channesh.org/admin/>. It is not linked from the public
+site and is marked `noindex`.
+
+Sveltia is a static page that commits to GitHub from your browser. It has no
+separate server. Sign in with a **fine-grained personal access token**:
+
+1. Create a fine-grained token in GitHub under **Settings → Developer
+   settings → Personal access tokens → Fine-grained tokens**.
+2. Resource owner: the GitHub organization that owns the repository.
+3. Repository access: only `cpus-website`.
+4. Repository permissions: **Contents: Read and write**. Add **Pull requests:
+   Read and write** only if the editorial workflow is enabled.
+5. Expiration: 90 days. Name it `CPUS CMS — <your name>`.
+6. Paste the token into the CMS sign-in dialog. It is stored in your browser's
+   `localStorage`, not in the repository.
+
+> **GitHub organization requirement.** Fine-grained PATs cannot write to a
+> repository where you are an outside or repository collaborator. The repository
+> must be owned by a GitHub organization, and you must be an organization member
+> with write access. Adding you as a collaborator on a personal repository does
+> not satisfy this. The repository is currently on a personal account; the owner
+> must transfer it to a free organization before other editors can use the CMS.
+
+The CMS opens **Articles**, **Series**, and **Pages**. Choose an entry, edit it,
+and select **Save**. With the current simple workflow, a save commits directly to
+`main`; the Pages workflow then builds and deploys the site. To keep work out of
+the live site, set `draft: true` and save; drafts are visible in local dev but
+excluded from production builds.
+
+New entries need a slug. The CMS requires lowercase ASCII letters, numbers, and
+hyphens. For a Kannada title, type a descriptive English or transliterated slug
+yourself; do not use Kannada characters in the URL. The slug cannot be changed
+after the entry is created.
+
+The CMS does not create or delete pages, and it cannot delete articles or
+series. Use Git for those operations. It also cannot edit `src/data/site.ts`,
+navigation, styles, or code; those remain code-reviewed.
+
+The body editor opens in **raw Markdown** first, so existing formatting is
+preserved. Switch to the rich text mode if you prefer, but review the diff: the
+editor may normalise Markdown syntax, and it strips trailing whitespace. If a
+line break depends on two trailing spaces, use a blank line or `<br>` instead.
+For image captions, stay in raw Markdown and use
+`![alt](fig-01.jpg "Caption")`; the rich text image dialog's caption field saves
+HTML and bypasses Astro's image optimisation.
+
 ## Add an article
 
 1. Pick a slug. It is lowercase ASCII, hyphenated, descriptive, and has no date:
@@ -158,6 +206,11 @@ An image alone on its line becomes a `<figure>`. If the Markdown title is
 present, it becomes the `<figcaption>`. The `alt` text is required for
 accessibility; the caption is optional editorial context.
 
+In the CMS, upload body images in the raw Markdown mode so they are saved beside
+`index.md` and keep the Markdown image syntax. Prefer the Markdown title for a
+caption. The rich text image dialog's **Caption** field saves an HTML `<figure>`
+instead; the site styles it, but Astro does not optimise images inside raw HTML.
+
 Prefer local `.jpg`, `.jpeg`, `.png`, or `.webp` files. Astro generates
 responsive WebP variants at build time. Remote images bypass the pipeline and
 should be avoided unless there is a reason to hotlink.
@@ -222,6 +275,9 @@ committed.
 - [ ] Series slug exists, and `seriesOrder` is correct.
 - [ ] Cover exists, has `coverAlt`, and uses the right `coverStyle`.
 - [ ] Body images have alt text and useful captions.
+- [ ] If saved through the CMS, the Git diff does not contain unintended
+      Markdown normalisation or image path changes.
+- [ ] New slugs are lowercase ASCII and will not need to change.
 - [ ] `bun run check` passes.
 - [ ] `bun run build` passes.
 - [ ] Article renders at 360 px, 390 px, tablet, and desktop.
@@ -239,3 +295,7 @@ committed.
 | Image not found | Wrong relative path or missing file | Keep images beside `index.md` and use `./name.jpg`. |
 | Missing tag page | No published article uses the tag | Add the tag to an article. |
 | Article missing from production | `draft: true` | Set `draft: false`. |
+| CMS sign-in fails with a fine-grained token | The repository is on a personal account and you are an outside collaborator | Move the repository to an organization and join it as a member. |
+| CMS save fails with “Resource not accessible by personal access token” | The token lacks Contents write, or Pull requests write for the editorial workflow | Edit or recreate the token with the required permissions. |
+| CMS rejects a new slug | It contains uppercase, spaces, underscores, or non-ASCII characters | Use lowercase ASCII letters, numbers, and hyphens. |
+| CMS image is missing after save | The upload went to the wrong folder or the Markdown path is wrong | Keep article and series images beside `index.md`; use the raw Markdown image syntax. |
