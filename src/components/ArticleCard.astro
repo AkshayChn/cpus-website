@@ -51,7 +51,7 @@ const isTall = article.data.cover
   <div class="flex flex-col gap-2">
     <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-accent">
       {series && <a href={url(`/series/${series.id}/`)} class="hover:underline">{series.data.title}</a>}
-      <span class="text-rule">/</span>
+      <span class="text-rule" aria-hidden="true">/</span>
       <time datetime={article.data.publishedAt.toISOString()}>{date}</time>
     </div>
 

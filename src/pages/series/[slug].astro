@@ -132,7 +132,7 @@ const startArticle = startHere.length === 1 ? startHere[0] : undefined;
                 <time datetime={startArticle.data.publishedAt.toISOString()}>
                   {formatDate(startArticle.data.publishedAt)}
                 </time>
-                <span class="mx-1.5 text-rule">·</span>
+                <span class="mx-1.5 text-rule" aria-hidden="true">·</span>
                 {readingTime(startArticle)} min read
               </p>
             </div>

@@ -44,7 +44,7 @@
   --rule: #ded8cc;
   --accent: #1f5a45;
   --accent-soft: #e3efe9;
-  --highlight: #b4552d;
+  --highlight: #ae5029;
   --highlight-soft: #f6e7dd;
   --header: #e8c751;
   --header-ink: #1c1b19;
@@ -64,61 +64,66 @@
   --highlight-soft: #443027;
 }
 
-html {
-  background: var(--paper);
-  color: var(--ink);
-  font-family: var(--font-ui);
-  scroll-padding-top: 5rem;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-
-@media (prefers-reduced-motion: no-preference) {
+/* Base element styles live in the base layer so Tailwind utilities can
+   override them. An unlayered `a { color: inherit }` silently beats every
+   `text-*` utility, including the mobile menu in dark mode. */
+@layer base {
   html {
-    scroll-behavior: smooth;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-ui);
+    scroll-padding-top: 5rem;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
-}
 
-:lang(kn) {
-  font-family: var(--font-kn);
-}
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
 
-body {
-  display: flex;
-  flex-direction: column;
-  margin: 0;
-  min-height: 100svh;
-  background: var(--paper);
-  color: var(--ink);
-}
+  :lang(kn) {
+    font-family: var(--font-kn);
+  }
 
-main {
-  flex: 1 0 auto;
-}
+  body {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    min-height: 100svh;
+    background: var(--paper);
+    color: var(--ink);
+  }
 
-html[data-banner-dismissed='true'] #construction-banner {
-  display: none;
-}
+  main {
+    flex: 1 0 auto;
+  }
 
-::selection {
-  background: var(--accent);
-  color: var(--paper);
-}
+  html[data-banner-dismissed='true'] #construction-banner {
+    display: none;
+  }
 
-:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
-}
+  ::selection {
+    background: var(--accent);
+    color: var(--paper);
+  }
 
-a {
-  color: inherit;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.18em;
-}
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
 
-img {
-  max-width: 100%;
-  height: auto;
+  a {
+    color: inherit;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
 }
 
 /* Article body typography, tuned for Kannada first. */

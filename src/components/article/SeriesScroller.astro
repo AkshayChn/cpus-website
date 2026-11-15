@@ -88,7 +88,7 @@ const { articles, series, title, kicker, linkHref, linkLabel = 'View all' } = As
                     <time datetime={entry.data.publishedAt.toISOString()}>
                       {formatDate(entry.data.publishedAt)}
                     </time>
-                    <span class="mx-1.5 text-rule">·</span>
+                    <span class="mx-1.5 text-rule" aria-hidden="true">·</span>
                     {readingTime(entry)} min read
                   </p>
                 </div>
