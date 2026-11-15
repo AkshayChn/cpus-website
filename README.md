@@ -227,7 +227,8 @@ refresh before assuming the build failed.
   changes.
 - Never commit a personal access token. Editors keep their token in their own
   browser; the repository contains no credentials.
-- No client-side framework and no component library.
+- No client-side framework and no component library on the public site. The
+  `/admin/` page loads the third-party Sveltia runtime.
 - The only raw inline script is the theme/banner bootstrap in
   `src/layouts/BaseLayout.astro`, which prevents a theme flash before paint.
 - Keep `noindex` and the `robots.txt` disallow until launch.
