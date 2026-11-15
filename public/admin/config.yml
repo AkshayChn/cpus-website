@@ -1,0 +1,110 @@
+# Sveltia CMS configuration for the CPUS site.
+#
+# The admin page is static: public/admin/index.html.
+# Authentication is token-only. No OAuth client or auth server is used.
+#
+# During the cms-pilot branch, saves go to cms-pilot. Change this to main
+# before merging the pilot.
+
+backend:
+  name: github
+  repo: AkshayChn/cpus-website
+  branch: cms-pilot
+  auth_methods: [token]
+  commit_messages:
+    create: 'content: add {{collection}} "{{slug}}"'
+    update: 'content: update {{collection}} "{{slug}}"'
+    delete: 'content: delete {{collection}} "{{slug}}"'
+    uploadMedia: 'media: upload "{{path}}"'
+    deleteMedia: 'media: delete "{{path}}"'
+
+# The pilot uses direct commits. Switch to editorial_workflow later if review
+# is required; the token then needs Pull requests read/write.
+publish_mode: simple
+
+# General media folder for flat content such as pages. Articles and series
+# override this with entry-relative folders.
+media_folder: public/uploads
+public_folder: /uploads
+
+# Do not write empty strings/arrays for optional fields; the Astro schemas use
+# .optional() and reject explicit empty values.
+output:
+  omit_empty_optional_fields: true
+
+media_libraries:
+  default:
+    config:
+      # 10 MiB. The migration process, not the CMS, should handle bulk images.
+      max_file_size: 10485760
+      slugify_filename: true
+
+collections:
+  - name: articles
+    label: Articles
+    folder: src/content/articles
+    path: '{{slug}}/index'
+    media_folder: ''
+    public_folder: ''
+    extension: md
+    format: yaml-frontmatter
+    create: true
+    delete: false
+    slug:
+      editable: [create]
+      pattern: ['^[a-z0-9]+(?:-[a-z0-9]+)*$', 'Use lowercase ASCII letters, numbers, and hyphens only']
+    fields:
+      - { name: title, label: Title }
+      - { name: summary, label: Summary, widget: text }
+      - { name: publishedAt, label: Published at, widget: datetime, type: date, default: '{{now}}' }
+      - { name: updatedAt, label: Updated at, widget: datetime, type: date, required: false }
+      - { name: series, label: Series, widget: relation, collection: series, required: false }
+      - { name: seriesOrder, label: Series order, widget: number, required: false }
+      - { name: language, label: Language, widget: select, options: [kn, en], default: kn }
+      - { name: author, label: Author, default: CPUS }
+      - { name: tags, label: Tags, widget: list, required: false }
+      - { name: cover, label: Cover image, widget: image, required: false, accept: 'image/*' }
+      - { name: coverAlt, label: Cover alt text, widget: string, required: false }
+      - { name: coverStyle, label: Cover style, widget: select, options: [hero, plate], required: false }
+      - { name: featured, label: Featured, widget: boolean, default: false }
+      - { name: draft, label: Draft, widget: boolean, default: false }
+      - { name: body, label: Body, widget: markdown }
+
+  - name: series
+    label: Series
+    folder: src/content/series
+    path: '{{slug}}/index'
+    media_folder: ''
+    public_folder: ''
+    extension: md
+    format: yaml-frontmatter
+    create: true
+    delete: false
+    slug:
+      editable: [create]
+      pattern: ['^[a-z0-9]+(?:-[a-z0-9]+)*$', 'Use lowercase ASCII letters, numbers, and hyphens only']
+    fields:
+      - { name: title, label: Title }
+      - { name: titleKn, label: Kannada title, required: false }
+      - { name: description, label: Description, widget: text }
+      - { name: cover, label: Cover image, widget: image, required: false, accept: 'image/*' }
+      - { name: order, label: Order, widget: number, default: 0 }
+      - { name: featured, label: Featured, widget: boolean, default: false }
+      - { name: parent, label: Parent series, widget: relation, collection: series, required: false }
+      - { name: startHere, label: Start here, widget: relation, collection: articles, multiple: true, required: false }
+      - { name: draft, label: Draft, widget: boolean, default: false }
+      - { name: body, label: Body, widget: markdown, required: false }
+
+  - name: pages
+    label: Pages
+    folder: src/content/pages
+    extension: md
+    format: yaml-frontmatter
+    create: false
+    delete: false
+    fields:
+      - { name: title, label: Title }
+      - { name: description, label: Description, widget: text, required: false }
+      - { name: updatedAt, label: Updated at, widget: datetime, type: date, required: false }
+      - { name: draft, label: Draft, widget: boolean, default: false }
+      - { name: body, label: Body, widget: markdown }
