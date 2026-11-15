@@ -53,15 +53,15 @@
 
 [data-theme='dark'] {
   color-scheme: dark;
-  --paper: #24211d;
-  --surface: #2d2924;
-  --ink: #f3efe6;
-  --muted: #c0b9ad;
-  --rule: #4b453e;
+  --paper: #252525;
+  --surface: #2e2e2e;
+  --ink: #f2f2f2;
+  --muted: #bdbdbd;
+  --rule: #4b4b4b;
   --accent: #9bd9bd;
-  --accent-soft: #30352f;
+  --accent-soft: #333333;
   --highlight: #e8a078;
-  --highlight-soft: #443027;
+  --highlight-soft: #3b3b3b;
 }
 
 /* Base element styles live in the base layer so Tailwind utilities can
