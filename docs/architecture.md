@@ -174,7 +174,7 @@ Content collections are defined in `src/content.config.ts`:
 | --- | --- | --- | --- |
 | `articles` | `src/content/articles/**/index.md` | `glob` | Top-level folder name |
 | `series` | `src/content/series/**/index.md` | `glob` | Top-level folder name |
-| `pages` | `src/content/pages/**/*.md` | `glob` | File path without extension |
+| `pages` | `src/content/pages/**/index.md` | `glob` | Top-level folder name |
 
 Each collection has a Zod schema. The schema is the contract: it validates types,
 coerces dates, defaults `language` to `kn`, defaults `tags` to an empty array,
@@ -334,22 +334,22 @@ server.
 
 - Articles and series use page bundles (`path: '{{slug}}/index'`, entry-relative
   `media_folder` and `public_folder`) so images stay beside `index.md`.
-- Pages are flat files; the CMS allows editing but not creating or deleting
-  them. Page media is entry-relative to `src/content/pages`, so Astro can
+- Pages are page bundles too; the CMS allows editing but not creating or
+  deleting them. Page media is entry-relative to the page folder, so Astro can
   optimise it.
 - `output.omit_empty_optional_fields: true` keeps empty optional fields out of
   the frontmatter, matching the Zod `.optional()` schemas.
 - The series collection intentionally has no body field: the series page renders
   its `description` and article lists, not a body.
-
-`bun run check:cms` runs `scripts/check-cms-model.ts`. It validates the CMS
-config against the canonical collection model, checks that articles and series
-are page bundles, pages stay flat, slugs and tags match their patterns, series
-and parent references exist, `startHere` points at real articles, covers and
-body images exist beside the right entry, and no content images were moved into
-`public/`. CI runs it before the build.
 - The CMS is deliberately not allowed to edit `src/data/site.ts`, navigation,
   styles, or code. Those remain code-reviewed.
+
+`bun run check:cms` runs `scripts/check-cms-model.ts`. It validates the CMS
+config against the canonical collection model, checks that all three collections
+are page bundles, slugs and tags match their patterns, series and parent
+references exist, `startHere` points at real articles, covers and body images
+exist beside the right entry, and no content images were moved into `public/`.
+CI runs it before the build.
 
 The current workflow is **simple**: a save commits directly to the configured
 branch. On the `sveltia-cms` integration branch that is `sveltia-cms`, so test
@@ -435,7 +435,7 @@ The site is intentionally `noindex`:
 | --- | --- |
 | Add or edit an article | `src/content/articles/<slug>/index.md` and images beside it |
 | Add or edit a series | `src/content/series/<slug>/index.md` |
-| Edit About or Resources prose | `src/content/pages/*.md` |
+| Edit About or Resources prose | `src/content/pages/<slug>/index.md` |
 | Change nav, footer, contact, social, donation | `src/data/site.ts`, `src/components/Header.astro`, `src/components/Footer.astro` |
 | Change colours, fonts, prose, dark mode | `src/styles/global.css` |
 | Change the article reading layout | `src/pages/articles/[slug].astro`, `src/components/article/*`, `src/scripts/article.ts` |

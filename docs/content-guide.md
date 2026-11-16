@@ -158,8 +158,9 @@ Child series articles are included in the parent series count and listing.
 
 ## Page frontmatter
 
-Static prose pages live in `src/content/pages/*.md` and are rendered by
-`src/pages/about.astro` and `src/pages/resources.astro`.
+Static prose pages live in `src/content/pages/<slug>/index.md` and are rendered
+by `src/pages/about.astro` and `src/pages/resources.astro`. Pages are page
+bundles like articles and series, but the CMS cannot create or delete them.
 
 ```yaml
 ---
@@ -179,9 +180,9 @@ draft: false
 
 ## Images
 
-All article and series images live beside their `index.md`. Page images live in
-`src/content/pages/`, next to the page Markdown. Do not put content images in
-`public/`; that bypasses validation, resizing, and hashed filenames.
+All article, series, and page images live beside their `index.md`. Do not put
+content images in `public/`; that bypasses validation, resizing, and hashed
+filenames.
 
 ### Covers
 
@@ -213,13 +214,12 @@ present, it becomes the `<figcaption>`. The `alt` text is required for
 accessibility; the caption is optional editorial context.
 
 In the CMS, upload body images from the entry so they are stored under
-`src/content/` and keep the Markdown image syntax. Article and series images are
-saved beside `index.md`; page images are saved in `src/content/pages/`. Use the
-rich text Image dialog's **Upload** option to place the file, then switch back to
-raw Markdown if you prefer. Use the Markdown title for a raw-Markdown caption,
-or the rich text dialog's **Caption** field. The latter saves a single-line HTML
-`<figure>`, which `remark-html-figure` converts back to a Markdown image before
-Astro optimises it.
+`src/content/` and keep the Markdown image syntax. Article, series, and page
+images are saved beside `index.md`. Use the rich text Image dialog's **Upload**
+option to place the file, then switch back to raw Markdown if you prefer. Use the
+Markdown title for a raw-Markdown caption, or the rich text dialog's **Caption**
+field. The latter saves a single-line HTML `<figure>`, which
+`remark-html-figure` converts back to a Markdown image before Astro optimises it.
 
 Prefer local `.jpg`, `.jpeg`, `.png`, or `.webp` files. Astro generates
 responsive WebP variants at build time. Remote images bypass the pipeline and

@@ -144,8 +144,8 @@ Content lives in `src/content/`:
 - `articles/<slug>/index.md` — one folder per article. Images live beside the
   Markdown file and are referenced relatively.
 - `series/<slug>/index.md` — series metadata and a short description.
-- `pages/*.md` — prose pages such as About and Resources. Page images live in
-  `src/content/pages/` beside the Markdown.
+- `pages/<slug>/index.md` — prose pages such as About and Resources. Page images
+  live beside `index.md`.
 
 Editors can use the CMS at `/admin/` instead of editing these files directly.
 The CMS writes the same Markdown and image layout described below. See

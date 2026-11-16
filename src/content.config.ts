@@ -53,7 +53,8 @@ const series = defineCollection({
 const pages = defineCollection({
   loader: glob({
     base: './src/content/pages',
-    pattern: '**/*.md',
+    pattern: '**/index.md',
+    generateId: ({ entry }) => entry.split('/')[0],
   }),
   schema: z.object({
     title: z.string(),

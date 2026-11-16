@@ -1,5 +1,5 @@
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
-import { basename, dirname, join, relative, resolve } from 'node:path';
+import { dirname, join, relative, resolve } from 'node:path';
 import { parse } from 'yaml';
 
 /**
@@ -34,7 +34,7 @@ interface Entry {
 
 interface CollectionModel {
   folder: string;
-  bundle: boolean;
+  slugMode: 'create' | 'fixed';
   fields: string[];
   required: string[];
 }
@@ -42,7 +42,7 @@ interface CollectionModel {
 const model: Record<string, CollectionModel> = {
   articles: {
     folder: 'src/content/articles',
-    bundle: true,
+    slugMode: 'create',
     fields: [
       'title',
       'summary',
@@ -64,7 +64,7 @@ const model: Record<string, CollectionModel> = {
   },
   series: {
     folder: 'src/content/series',
-    bundle: true,
+    slugMode: 'create',
     fields: [
       'title',
       'titleKn',
@@ -80,7 +80,7 @@ const model: Record<string, CollectionModel> = {
   },
   pages: {
     folder: 'src/content/pages',
-    bundle: false,
+    slugMode: 'fixed',
     fields: ['title', 'description', 'updatedAt', 'draft', 'body'],
     required: ['title'],
   },
@@ -263,11 +263,11 @@ if (!isFile(configPath)) {
         fail(`CMS config: ${name}.folder must be "${expected.folder}"`);
       }
 
-      if (expected.bundle) {
-        if (collection.path !== '{{slug}}/index') {
-          fail(`CMS config: ${name}.path must be "{{slug}}/index"`);
-        }
+      if (collection.path !== '{{slug}}/index') {
+        fail(`CMS config: ${name}.path must be "{{slug}}/index"`);
+      }
 
+      if (expected.slugMode === 'create') {
         if (
           !Array.isArray(collection.slug?.editable) ||
           !collection.slug.editable.includes('create') ||
@@ -279,11 +279,7 @@ if (!isFile(configPath)) {
         if (collection.slug?.pattern?.[0] !== SLUG_REGEX.source) {
           fail(`CMS config: ${name}.slug.pattern must match the content slug pattern`);
         }
-      } else if (collection.path !== undefined) {
-        fail(`CMS config: ${name} must remain a flat collection (no path option)`);
-      }
-
-      if (!expected.bundle && collection.slug?.editable !== false) {
+      } else if (collection.slug?.editable !== false) {
         fail(`CMS config: ${name}.slug must not be editable`);
       }
 
@@ -299,10 +295,8 @@ if (!isFile(configPath)) {
         fail(`CMS config: ${name}.format must be "yaml-frontmatter"`);
       }
 
-      if (!expected.bundle) {
-        if (collection.create !== false || collection.delete !== false) {
-          fail('CMS config: pages must not be created or deleted from the CMS');
-        }
+      if (name === 'pages' && (collection.create !== false || collection.delete !== false)) {
+        fail('CMS config: pages must not be created or deleted from the CMS');
       }
 
       const fields = Array.isArray(collection.fields) ? collection.fields : [];
@@ -445,7 +439,7 @@ const pagesDir = join(root, model.pages.folder);
 
 const articleSlugs = new Set(listDirs(articlesDir));
 const seriesSlugs = new Set(listDirs(seriesDir));
-const pageSlugs = new Set(listMarkdownFiles(pagesDir).map((name) => basename(name, '.md')));
+const pageSlugs = new Set(listDirs(pagesDir));
 
 for (const slug of articleSlugs) {
   if (!SLUG_REGEX.test(slug)) fail(`articles: invalid slug "${slug}"`);
@@ -461,6 +455,7 @@ for (const slug of pageSlugs) {
 
 const looseArticleFiles = listMarkdownFiles(articlesDir);
 const looseSeriesFiles = listMarkdownFiles(seriesDir);
+const loosePageFiles = listMarkdownFiles(pagesDir);
 
 for (const file of looseArticleFiles) {
   fail(`articles: ${file} must live in <slug>/index.md, not directly under the collection folder`);
@@ -470,8 +465,13 @@ for (const file of looseSeriesFiles) {
   fail(`series: ${file} must live in <slug>/index.md, not directly under the collection folder`);
 }
 
+for (const file of loosePageFiles) {
+  fail(`pages: ${file} must live in <slug>/index.md, not directly under the collection folder`);
+}
+
 const articleEntries = new Map<string, Entry>();
 const seriesEntries = new Map<string, Entry>();
+const pageEntries = new Map<string, Entry>();
 
 for (const slug of articleSlugs) {
   const path = join(articlesDir, slug, 'index.md');
@@ -497,6 +497,19 @@ for (const slug of seriesSlugs) {
   const entry = parseEntry(path);
 
   if (entry) seriesEntries.set(slug, entry);
+}
+
+for (const slug of pageSlugs) {
+  const path = join(pagesDir, slug, 'index.md');
+
+  if (!isFile(path)) {
+    fail(`pages/${slug}: missing index.md`);
+    continue;
+  }
+
+  const entry = parseEntry(path);
+
+  if (entry) pageEntries.set(slug, entry);
 }
 
 // Articles
@@ -647,19 +660,8 @@ for (const [slug, entry] of seriesEntries) {
 }
 
 // Pages
-const pageDirs = listDirs(pagesDir);
-
-if (pageDirs.length > 0) {
-  fail(`pages: pages must remain flat .md files; found subdirectories: ${pageDirs.join(', ')}`);
-}
-
-for (const file of listMarkdownFiles(pagesDir)) {
-  const path = join(pagesDir, file);
-  const entry = parseEntry(path);
-
-  if (!entry) continue;
-
-  const context = rel(path);
+for (const entry of pageEntries.values()) {
+  const context = rel(entry.path);
 
   requireString(entry, 'title');
   requireString(entry, 'description', { optional: true });
@@ -671,7 +673,7 @@ for (const file of listMarkdownFiles(pagesDir)) {
   }
 
   for (const image of extractImages(entry.body)) {
-    checkLocalImage(image, pagesDir, `${context}: body image`, { allowExternal: true });
+    checkLocalImage(image, dirname(entry.path), `${context}: body image`, { allowExternal: true });
   }
 }
 
@@ -696,7 +698,7 @@ if (isDir(publicUploads)) {
 // ---------------------------------------------------------------------------
 
 console.log(
-  `CMS model: ${articleEntries.size} articles, ${seriesEntries.size} series, ${pageSlugs.size} pages`,
+  `CMS model: ${articleEntries.size} articles, ${seriesEntries.size} series, ${pageEntries.size} pages`,
 );
 
 if (warnings.length > 0) {
