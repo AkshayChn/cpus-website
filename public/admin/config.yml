@@ -24,15 +24,17 @@ backend:
     deleteMedia: 'media: delete "{{path}}"'
 
 site_url: https://channesh.org
-logo_url: https://channesh.org/favicon.svg
+logo:
+  src: https://channesh.org/favicon.svg
 
 # Direct commits to the configured branch. The editorial workflow (branches and
 # pull requests) is a later decision; it would need Pull requests read/write on
 # each editor's token.
 publish_mode: simple
 
-# Media defaults. Articles and series override these with entry-relative
-# folders, so their images stay beside index.md. Flat pages use these defaults.
+# Media defaults. Articles, series, and pages use entry-relative folders:
+# article/series images stay beside index.md, and page images stay under
+# src/content/pages. The global folder is a fallback for the Asset Library.
 media_folder: public/uploads
 public_folder: /uploads
 
@@ -229,6 +231,10 @@ collections:
         collection: series
         display_fields: [title]
         search_fields: [title, titleKn]
+        filters:
+          - field: slug
+            values: ['{{slug}}']
+            exclude: true
         required: false
         hint: 'Optional. Makes this a child series, such as a yearly Nobel edition.'
       - name: startHere
@@ -245,17 +251,13 @@ collections:
         widget: boolean
         default: false
         hint: 'Drafts are hidden from production builds.'
-      - name: body
-        label: Body
-        widget: markdown
-        modes: [raw, rich_text]
-        required: false
-        hint: 'Optional short introduction for the series page.'
 
   - name: pages
     label: Pages
     label_singular: Page
     folder: src/content/pages
+    media_folder: ''
+    public_folder: ''
     extension: md
     format: yaml-frontmatter
     create: false

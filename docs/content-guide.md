@@ -50,9 +50,11 @@ The body editor opens in **raw Markdown** first, so existing formatting is
 preserved. Switch to the rich text mode if you prefer, but review the diff: the
 editor may normalise Markdown syntax, and it strips trailing whitespace. If a
 line break depends on two trailing spaces, use a blank line or `<br>` instead.
-For image captions, stay in raw Markdown and use
-`![alt](fig-01.jpg "Caption")`; the rich text image dialog's caption field saves
-HTML and bypasses Astro's image optimisation.
+For image captions, use `![alt](fig-01.jpg "Caption")` in raw Markdown or the
+rich text image dialog's **Caption** field. Both become a `<figure>` with the
+same optimised image. To upload a body image, switch to rich text mode and use
+the Image button's **Upload** option; the raw Markdown image button only inserts
+`![]()` for you to fill in.
 
 ## Add an article
 
@@ -177,14 +179,16 @@ draft: false
 
 ## Images
 
-All article and series images live beside their Markdown file. Do not put
-content images in `public/`; that bypasses validation, resizing, and hashed
-filenames.
+All article and series images live beside their `index.md`. Page images live in
+`src/content/pages/`, next to the page Markdown. Do not put content images in
+`public/`; that bypasses validation, resizing, and hashed filenames.
 
 ### Covers
 
-Use `cover: ./cover.jpg`. A wide landscape image works best as a hero. The
-article page automatically uses the framed **plate** treatment when the cover is:
+Use `cover: ./cover.jpg`. The CMS may save this as `cover.jpg` rather than
+`./cover.jpg`; both resolve relative to `index.md`. A wide landscape image works
+best as a hero. The article page automatically uses the framed **plate**
+treatment when the cover is:
 
 - portrait (taller than wide), or
 - narrower than 700 px.
@@ -208,10 +212,14 @@ An image alone on its line becomes a `<figure>`. If the Markdown title is
 present, it becomes the `<figcaption>`. The `alt` text is required for
 accessibility; the caption is optional editorial context.
 
-In the CMS, upload body images in the raw Markdown mode so they are saved beside
-`index.md` and keep the Markdown image syntax. Prefer the Markdown title for a
-caption. The rich text image dialog's **Caption** field saves an HTML `<figure>`
-instead; the site styles it, but Astro does not optimise images inside raw HTML.
+In the CMS, upload body images from the entry so they are stored under
+`src/content/` and keep the Markdown image syntax. Article and series images are
+saved beside `index.md`; page images are saved in `src/content/pages/`. Use the
+rich text Image dialog's **Upload** option to place the file, then switch back to
+raw Markdown if you prefer. Use the Markdown title for a raw-Markdown caption,
+or the rich text dialog's **Caption** field. The latter saves a single-line HTML
+`<figure>`, which `remark-html-figure` converts back to a Markdown image before
+Astro optimises it.
 
 Prefer local `.jpg`, `.jpeg`, `.png`, or `.webp` files. Astro generates
 responsive WebP variants at build time. Remote images bypass the pipeline and

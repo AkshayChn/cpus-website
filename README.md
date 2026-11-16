@@ -59,6 +59,8 @@ sign in with a token but cannot use the local repository workflow.
 | `bun run build` | Production build into `dist/`. |
 | `bun run preview` | Serve the built `dist/` locally. |
 | `bun run check` | Astro and TypeScript diagnostics. CI runs this before building. |
+| `bun run check:cms` | Validate the CMS config, content model, references, tags, and media paths. |
+| `bun test` | Unit tests, including the Sveltia HTML-figure Markdown transform. |
 
 Use Bun or Astro for local serving. Do **not** use `python3 -m http.server` as a
 project server; it bypasses Astro routing and the build output conventions.
@@ -80,6 +82,8 @@ Astro compiles the whole site ahead of time:
    and renders an HTML template.
 4. Markdown is converted to HTML. `rehype-slug` adds heading IDs and
    `rehype-figure` turns a standalone image into `<figure>` + `<figcaption>`.
+   `remark-html-figure` converts Sveltia's captioned-image HTML back into a
+   Markdown image first, so Astro's image pipeline still applies.
 5. `<Image>` from `astro:assets` emits responsive WebP variants with hashed
    filenames.
 6. The result is a plain static directory in `dist/`. GitHub Pages serves it.
@@ -140,7 +144,8 @@ Content lives in `src/content/`:
 - `articles/<slug>/index.md` — one folder per article. Images live beside the
   Markdown file and are referenced relatively.
 - `series/<slug>/index.md` — series metadata and a short description.
-- `pages/*.md` — prose pages such as About and Resources.
+- `pages/*.md` — prose pages such as About and Resources. Page images live in
+  `src/content/pages/` beside the Markdown.
 
 Editors can use the CMS at `/admin/` instead of editing these files directly.
 The CMS writes the same Markdown and image layout described below. See
@@ -180,13 +185,14 @@ Tags are manual, lowercase, and URL-safe. Do not infer them from article text.
 
 1. Set up Node 24 and Bun 1.4.4.
 2. `bun install --frozen-lockfile`
-3. `bun run check`
-4. `bun run build`
-5. Upload `dist/` as the GitHub Pages artifact and deploy it.
+3. `bun run check:cms`
+4. `bun test`
+5. `bun run check`
+6. `bun run build`
+7. Upload `dist/` as the GitHub Pages artifact and deploy it.
 
-`.github/workflows/check.yml` runs `bun install --frozen-lockfile`,
-`bun run check`, and `bun run build` on pull requests. It does not deploy. It
-also fails a pull request targeting `main` while the CMS
+`.github/workflows/check.yml` runs the same checks on pull requests. It does
+not deploy. It also fails a pull request targeting `main` while the CMS
 `backend.branch` is still `sveltia-cms`, so change that to `main` before merging
 the integration branch.
 

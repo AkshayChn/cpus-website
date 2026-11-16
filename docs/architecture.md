@@ -86,6 +86,9 @@ TypeScript modules.
    `rehype-slug` adds stable `id` attributes to headings (used by the table of
    contents). `src/lib/rehype-figure.ts` converts a standalone Markdown image
    into `<figure>` + optional `<figcaption>`.
+   `src/lib/remark-html-figure.ts` first converts the single-image HTML figure
+   Sveltia saves for a captioned image back into a Markdown image node, so Astro
+   collects and optimises it.
 6. **Process images.** `<Image>` from `astro:assets` reads the imported image,
    generates responsive widths, converts to WebP, and writes hashed files under
    `dist/_astro/`. The HTML gets a `srcset` and `sizes` attribute.
@@ -217,6 +220,11 @@ becomes:
 The transformation lives in `src/lib/rehype-figure.ts` and is registered in
 `astro.config.ts`.
 
+Sveltia's rich-text Caption field saves a single-line HTML `<figure>`. The
+`src/lib/remark-html-figure.ts` remark plugin converts that back into a Markdown
+image node with the caption as its title before Astro collects local images, so
+it takes the same figure and image pipeline.
+
 ## 7. Styling
 
 Tailwind CSS 4 is wired through the Vite plugin in `astro.config.ts`. There is
@@ -290,7 +298,9 @@ Two kinds of assets exist:
   `<Image>` optimises them. They are content, not public files.
 - **Public files** live in `public/` and are copied verbatim to `dist/`. This is
   reserved for `CNAME`, `favicon.svg`, `robots.txt`, and the static admin page
-  under `public/admin/`.
+  under `public/admin/`. The CMS's top-level `public/uploads` folder is only a
+  fallback for the Asset Library; collection media is entry-relative under
+  `src/content/`.
 
 Astro generates responsive variants and hashes filenames, so images can be
 cached forever. The lead image is eager; below-the-fold images are lazy. Width
@@ -325,9 +335,19 @@ server.
 - Articles and series use page bundles (`path: '{{slug}}/index'`, entry-relative
   `media_folder` and `public_folder`) so images stay beside `index.md`.
 - Pages are flat files; the CMS allows editing but not creating or deleting
-  them.
+  them. Page media is entry-relative to `src/content/pages`, so Astro can
+  optimise it.
 - `output.omit_empty_optional_fields: true` keeps empty optional fields out of
   the frontmatter, matching the Zod `.optional()` schemas.
+- The series collection intentionally has no body field: the series page renders
+  its `description` and article lists, not a body.
+
+`bun run check:cms` runs `scripts/check-cms-model.ts`. It validates the CMS
+config against the canonical collection model, checks that articles and series
+are page bundles, pages stay flat, slugs and tags match their patterns, series
+and parent references exist, `startHere` points at real articles, covers and
+body images exist beside the right entry, and no content images were moved into
+`public/`. CI runs it before the build.
 - The CMS is deliberately not allowed to edit `src/data/site.ts`, navigation,
   styles, or code. Those remain code-reviewed.
 
@@ -383,13 +403,16 @@ The workflow is `.github/workflows/deploy.yml`:
 1. Check out the repository.
 2. Install Node 24 and Bun 1.4.4.
 3. `bun install --frozen-lockfile`.
-4. `bun run check`.
-5. `bun run build`.
-6. Upload `dist` with `actions/upload-pages-artifact`.
-7. Deploy with `actions/deploy-pages`.
+4. `bun run check:cms`.
+5. `bun test`.
+6. `bun run check`.
+7. `bun run build`.
+8. Upload `dist` with `actions/upload-pages-artifact`.
+9. Deploy with `actions/deploy-pages`.
 
-`.github/workflows/check.yml` runs `bun install --frozen-lockfile`,
-`bun run check`, and `bun run build` on pull requests. It does not deploy.
+`.github/workflows/check.yml` runs the same checks on pull requests. It does not
+deploy. It also fails a pull request targeting `main` while the CMS
+`backend.branch` is still `sveltia-cms`.
 
 The Pages source must be set to **GitHub Actions** in the repository settings.
 The custom domain is `channesh.org` (`public/CNAME`). The workflow uses the
@@ -419,7 +442,7 @@ The site is intentionally `noindex`:
 | Change the homepage lead or grids | `src/pages/index.astro` |
 | Change content queries or sorting | `src/lib/content.ts` |
 | Change URL handling | `src/lib/url.ts` |
-| Change Markdown rendering | `astro.config.ts`, `src/lib/rehype-figure.ts` |
+| Change Markdown rendering | `astro.config.ts`, `src/lib/rehype-figure.ts`, `src/lib/remark-html-figure.ts` |
 | Edit content through the CMS | `https://channesh.org/admin/`; files under `src/content/` |
 | Change CMS collections or fields | `public/admin/config.yml` and `src/content.config.ts` together |
 | Change the CMS shell or runtime | `public/admin/index.html`, `public/admin/vendor/` |
