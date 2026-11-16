@@ -255,4 +255,4 @@ refresh before assuming the build failed.
 | Fonts look wrong | Kannada uses the Noto Serif Kannada subset; Latin prose uses the Georgia fallback, not a webfont. |
 | CMS sign-in fails with a fine-grained token | The repository is owned by a personal account and you are an outside collaborator | Move the repository to a GitHub organization and join it as a member. |
 | CMS save fails with “Resource not accessible by personal access token” | The token lacks Contents write (or Pull requests write for the editorial workflow) | Edit or recreate the token with the required permissions. |
-| A CMS image is missing after save | The upload went to the wrong folder or the Markdown path is wrong | Keep article and series images beside `index.md` and reference them relatively. |
+| A CMS image is missing after save | The upload went to the wrong folder or the Markdown path is wrong | Keep content images beside the entry's `index.md` and reference them relatively. |

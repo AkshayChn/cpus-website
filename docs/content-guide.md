@@ -308,4 +308,4 @@ committed.
 | CMS sign-in fails with a fine-grained token | The repository is on a personal account and you are an outside collaborator | Move the repository to an organization and join it as a member. |
 | CMS save fails with “Resource not accessible by personal access token” | The token lacks Contents write, or Pull requests write for the editorial workflow | Edit or recreate the token with the required permissions. |
 | CMS rejects a new slug | It contains uppercase, spaces, underscores, or non-ASCII characters | Use lowercase ASCII letters, numbers, and hyphens. |
-| CMS image is missing after save | The upload went to the wrong folder or the Markdown path is wrong | Keep article and series images beside `index.md`; use the raw Markdown image syntax. |
+| CMS image is missing after save | The upload went to the wrong folder or the Markdown path is wrong | Keep content images beside the entry's `index.md`; use the raw Markdown image syntax. |
