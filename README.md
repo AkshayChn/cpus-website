@@ -89,8 +89,8 @@ Astro compiles the whole site ahead of time:
 6. The result is a plain static directory in `dist/`. GitHub Pages serves it.
    There is no server runtime, database, or API at request time.
 
-The full walkthrough is in `docs/architecture.md`. Authoring rules are in
-`docs/content-guide.md`.
+The full walkthrough is in `docs/architecture.md`. Authoring guides start at
+`docs/README.md`.
 
 ## Repository map
 
@@ -109,7 +109,7 @@ The full walkthrough is in `docs/architecture.md`. Authoring rules are in
 │   ├── scripts/             # Small client-side TypeScript modules
 │   └── styles/global.css    # Tailwind import, design tokens, prose, dark mode
 ├── public/                  # Copied verbatim: CNAME, favicon, robots.txt, admin/
-├── docs/                    # Architecture and content guide
+├── docs/                    # Architecture, data model, and task guides
 ├── .github/workflows/       # Pull-request checks and GitHub Pages deployment
 ├── work/                    # Local notes and WordPress export (gitignored)
 └── dist/                    # Build output (gitignored)
@@ -149,7 +149,8 @@ Content lives in `src/content/`:
 
 Editors can use the CMS at `/admin/` instead of editing these files directly.
 The CMS writes the same Markdown and image layout described below. See
-`docs/content-guide.md` for the editor workflow and token requirements.
+`docs/using-the-cms.md` for the editor workflow and token requirements, and
+`docs/adding-an-article.md` for the manual and CMS paths side by side.
 
 A minimal article looks like this:
 
@@ -208,11 +209,19 @@ refresh before assuming the build failed.
 
 ## Documentation
 
+Start at [`docs/README.md`](docs/README.md).
+
 | File | Audience | Contents |
 | --- | --- | --- |
 | `README.md` | Everyone | Overview, setup, commands, map, deployment |
+| `docs/README.md` | Everyone | Documentation index and content-model summary |
+| `docs/data-model.md` | Editors and developers | Collections, fields, types, defaults, paths, relations, validation |
+| `docs/adding-an-article.md` | Editors and authors | Manual Git and CMS steps for a new article |
+| `docs/adding-a-series.md` | Editors and authors | Manual Git and CMS steps for a new series |
+| `docs/adding-a-page.md` | Editors and developers | Content bundle, Astro route, navigation, CMS limits |
+| `docs/using-the-cms.md` | Editors | Token sign-in, editing, media, validation, drafts, save behaviour |
+| `docs/content-guide.md` | Editors and authors | Writing, tagging, image alt text, integrity, review checklist |
 | `docs/architecture.md` | Developers | Astro build lifecycle, routing, styling, client JS, CMS architecture |
-| `docs/content-guide.md` | Editors and authors | CMS workflow, articles, frontmatter, images, series, tags |
 | `AGENTS.md` | Local coding agents | Working rules and conventions (gitignored) |
 | `work/` | Local only | Session notes, retro, WordPress export (gitignored) |
 

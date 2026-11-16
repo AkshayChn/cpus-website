@@ -182,6 +182,11 @@ and checks that `series` and `parent` point at real series entries. The
 `image()` helper validates image paths and returns metadata (width, height,
 format) that the templates use to choose the cover treatment.
 
+The field-by-field reference is in [`docs/data-model.md`](data-model.md). The
+task guides are [`docs/adding-an-article.md`](adding-an-article.md),
+[`docs/adding-a-series.md`](adding-a-series.md), and
+[`docs/adding-a-page.md`](adding-a-page.md).
+
 The CMS configuration in `public/admin/config.yml` mirrors this schema. When a
 field is added, renamed, or made optional, change both files in the same commit.
 
